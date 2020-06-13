@@ -46,7 +46,7 @@
 
 #### UEC++工程目录结构
 
-![image-20200513162122565](upload/image-20200513162122565.png)
+![image-20200513162122565](Assets/Unreal Engine Learn/image-20200513162122565.png)
 
 ##### Binaries - gitignore
 
@@ -86,7 +86,7 @@
 
 #### UEC++VS项目目录结构
 
-![image-20200513162219082](upload/image-20200513162219082.png)
+![image-20200513162219082](Assets/Unreal Engine Learn/image-20200513162219082.png)
 
 ##### Engine
 
@@ -123,7 +123,7 @@
 
 #### UEC++VS编译类型
 
-![image-20200513170855481](upload/image-20200513170855481.png)
+![image-20200513170855481](Assets/Unreal Engine Learn/image-20200513170855481.png)
 
 *如上图	Devrelopment：编译配置  Win64：编译目标平台*
 
@@ -195,7 +195,7 @@
 
 建议在引擎根目录进行细致的命名分化，以达到高效管理资产的目的，命名应遵循清晰/准确/简短的描述分类内容，尽量不要使用模糊描述。项目名称作为最顶层文件夹名称
 
-![image-20200514165039865](upload/image-20200514165039865.png)
+![image-20200514165039865](Assets/Unreal Engine Learn/image-20200514165039865.png)
 
 #### Actor相关
 
@@ -231,7 +231,7 @@ Actor是一个载体，载体上放的是组件，每一个Actor在场景中都�
 
 https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/index.html
 
-![image-20200514182332490](upload/image-20200514182332490.png)
+![image-20200514182332490](Assets/Unreal Engine Learn/image-20200514182332490.png)
 
 *如上图：*
 
@@ -241,11 +241,11 @@ https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/index.html
 
 ​	*Include	UWorld使用所要包含的内容*
 
-![image-20200514182843115](upload/image-20200514182843115.png)
+![image-20200514182843115](Assets/Unreal Engine Learn/image-20200514182843115.png)
 
 *如上图，UWorld所继承的类*
 
-![image-20200514183159658](upload/image-20200514183159658.png)
+![image-20200514183159658](Assets/Unreal Engine Learn/image-20200514183159658.png)
 
 如上图，需要什么函数就向下翻查阅即可
 
@@ -255,31 +255,31 @@ https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/index.html
 
   每个在场景中存在的对象，都可直接获取UWorld指针，因为UWorld属于Engine模块，而Games里已经包含Engine模块，所以直接调用GetWorld()即可得到UWorld对象指针
 
-  ![image-20200514202123534](upload/image-20200514202123534.png)
+  ![image-20200514202123534](Assets/Unreal Engine Learn/image-20200514202123534.png)
 
   如上图，虚幻框架规定GameMode是用来管理游戏规则的，看到的类并不是最终的类，会通过宏进行一次包装，LEARN03_API 修饰类宏
 
-  <img src="upload/image-20200514193106353.png" alt="image-20200514193106353" style="zoom:80%;" />
+  <img src="Assets/Unreal Engine Learn/image-20200514193106353.png" alt="image-20200514193106353" style="zoom:80%;" />
 
   *如上图，ALearn03GameModeBase最终继承的是Actor*
   
-  ![image-20200515151700709](upload/image-20200515151700709.png)
+  ![image-20200515151700709](Assets/Unreal Engine Learn/image-20200515151700709.png)
   
   *如上图，重写BeginPlay*
   
-  ![image-20200515152007624](upload/image-20200515152007624.png)
+  ![image-20200515152007624](Assets/Unreal Engine Learn/image-20200515152007624.png)
   
   *F7编译，或者如上图，点引擎中的编译按钮，编译好后会听到一个声音*
   
-  ![image-20200515152140801](upload/image-20200515152140801.png)
+  ![image-20200515152140801](Assets/Unreal Engine Learn/image-20200515152140801.png)
   
   *如上图，找到世界场景设置面板*
   
-  ![image-20200515152238671](upload/image-20200515152238671.png)
+  ![image-20200515152238671](Assets/Unreal Engine Learn/image-20200515152238671.png)
   
   *如上图，选择编译好的GameModeBase*
   
-  ![image-20200515153722115](upload/image-20200515153722115.png)
+  ![image-20200515153722115](Assets/Unreal Engine Learn/image-20200515153722115.png)
   
   获取UWorld指针通过SpawnActor函数生成Actor，同时设置好相应的参数，编译好后运行，此时即可看到世界大纲视图中出现了我们新生成的Actor
   
@@ -297,21 +297,21 @@ https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/index.html
 
 - **新建Actor类**
 
-  ![image-20200515161708042](upload/image-20200515161708042.png)
+  ![image-20200515161708042](Assets/Unreal Engine Learn/image-20200515161708042.png)
 
   直接在编辑器中找到C++类/XXX/右键新建C++类，最好不要在VS中创建C++类，因为他不会生成相应的类模板，需要自己去写
 
-  ![image-20200515161837172](upload/image-20200515161837172.png)
+  ![image-20200515161837172](Assets/Unreal Engine Learn/image-20200515161837172.png)
 
   想创建纯C++类就选无，想创建继承虚幻C++类的子类，就选你所需要继承的类，那么这里就选Actor
 
-  ![image-20200515164424698](upload/image-20200515164424698.png)
+  ![image-20200515164424698](Assets/Unreal Engine Learn/image-20200515164424698.png)
 
   修改相应的文件名路径等信息创建即可
 
-  ![image-20200515200759648](upload/image-20200515200759648.png)
+  ![image-20200515200759648](Assets/Unreal Engine Learn/image-20200515200759648.png)
 
-  ![image-20200515200819020](upload/image-20200515200819020.png)
+  ![image-20200515200819020](Assets/Unreal Engine Learn/image-20200515200819020.png)
 
   这样就是创建成功啦~
 
@@ -329,7 +329,7 @@ https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/IWYU/
 
 - **Destroy函数**
 
-  ![image-20200515214813036](upload/image-20200515214813036.png)
+  ![image-20200515214813036](Assets/Unreal Engine Learn/image-20200515214813036.png)
 
   调用自身Destroy函数进行强制销毁操作（Actor将被标记为等待销毁并从关卡的Actor阵列中移除）
 
@@ -342,7 +342,7 @@ https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/IWYU/
 
 - **SetLifeSpan函数**
 
-  ![image-20200515220848796](upload/image-20200515220848796.png)
+  ![image-20200515220848796](Assets/Unreal Engine Learn/image-20200515220848796.png)
 
   延时销毁函数
 
@@ -350,17 +350,17 @@ https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/IWYU/
 
 - **Destroyed函数**
 
-  <img src="upload/image-20200515222301339.png" alt="image-20200515222301339" style="zoom:67%;" />
+  <img src="Assets/Unreal Engine Learn/image-20200515222301339.png" alt="image-20200515222301339" style="zoom:67%;" />
 
   对象被销毁后回调该函数，在对应的Actor类中重写该函数即可
 
 - **EndPlay函数**
   
-  ![image-20200515225315421](upload/image-20200515225315421.png)
+  ![image-20200515225315421](Assets/Unreal Engine Learn/image-20200515225315421.png)
   
   对象被彻底销毁时回调，回调时会把销毁类型枚举传递进去
   
-  ![image-20200515225448606](upload/image-20200515225448606.png)
+  ![image-20200515225448606](Assets/Unreal Engine Learn/image-20200515225448606.png)
   
   - Destroyed
   
@@ -389,11 +389,11 @@ https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/IWYU/
 
 ##### 屏幕日志输出
 
-![image-20200517050348134](upload/image-20200517050348134.png)
+![image-20200517050348134](Assets/Unreal Engine Learn/image-20200517050348134.png)
 
 通过全局变量GEngine指针调用AddOnScreenDebugMessage即可完成屏幕输出
 
-![image-20200517040741644](upload/image-20200517040741644.png)
+![image-20200517040741644](Assets/Unreal Engine Learn/image-20200517040741644.png)
 
 **TEXT宏**
 
@@ -403,7 +403,7 @@ https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/IWYU/
 
 VS会将.cpp .h文件默认以GBK编码方式存储，而虚幻中真正编译项目不是在VS中编译的，而是借助外部编译工具[UBT](https://docs.unrealengine.com/zh-CN/Programming/BuildTools/UnrealBuildTool/index.html)去编译工程，所以会依赖文本类文件的编码方式，就需要把VS的默认编码方式改为UFT-8，否则中文会出现乱码的情况
 
-![image-20200517033445141](upload/image-20200517033445141.png)
+![image-20200517033445141](Assets/Unreal Engine Learn/image-20200517033445141.png)
 
 若Key值是-1，添加新的消息，不会覆盖旧消息，bNewerOnTop有效，直接添加至队列最上层
 
@@ -415,25 +415,25 @@ TextScale 缩放信息
 
 通过宏UE_LOG进行控制台日志输出，日志会被写入本地缓存
 
-![image-20200517052025754](upload/image-20200517052025754.png)
+![image-20200517052025754](Assets/Unreal Engine Learn/image-20200517052025754.png)
 
 - CategoryName 日志分类 可自定义 决定了控制台输出的分类项
 
 - Verbosity 日志类型
 
-  <img src="upload/image-20200517053010564.png" alt="image-20200517053010564" style="zoom: 50%;" />
+  <img src="Assets/Unreal Engine Learn/image-20200517053010564.png" alt="image-20200517053010564" style="zoom: 50%;" />
 
 - Format 日志内容
 
 - Log存放路径
 
-![image-20200517054034438](upload/image-20200517054034438.png)
+![image-20200517054034438](Assets/Unreal Engine Learn/image-20200517054034438.png)
 
 **自定义日志分类**
 
 - 声明日志分类
 
-  ![image-20200517064336652](upload/image-20200517064336652.png)
+  ![image-20200517064336652](Assets/Unreal Engine Learn/image-20200517064336652.png)
 
   ```c++
   DECLARE_LOG_CATEGORY_EXTERN(CategoryName, DefaultVerbosity, CompileTimeVerbosity);
@@ -447,13 +447,13 @@ TextScale 缩放信息
 
 - 定义日志分类
 
-  ![image-20200517064304983](upload/image-20200517064304983.png)
+  ![image-20200517064304983](Assets/Unreal Engine Learn/image-20200517064304983.png)
 
 ##### 格式化日志输出
 
 虚幻UE_LOG支持可变参进行构建复杂语句格式，通过占位符进行输入导入，用来编写更清晰的日志语句
 
-![image-20200517082448954](upload/image-20200517082448954.png)
+![image-20200517082448954](Assets/Unreal Engine Learn/image-20200517082448954.png)
 
 #### UEC++基础数据类型
 
@@ -477,11 +477,11 @@ TextScale 缩放信息
 
 UE中的所有字符串都作为FString或TCHAR数组以UTF-16格式存储在内存中。
 
-![image-20200517101956544](upload/image-20200517101956544.png)
+![image-20200517101956544](Assets/Unreal Engine Learn/image-20200517101956544.png)
 
 UE提供多种字符类型进行数据处理，不同情况选择相应的类型进行操作即可，区别就是大小不同，编码方式不同，所有的文本在进行存储的时候，编译器编译阶段会根据编码类型进行转码
 
-![image-20200517103516108](upload/image-20200517103516108.png)
+![image-20200517103516108](Assets/Unreal Engine Learn/image-20200517103516108.png)
 
 上图所示，转码宏
 

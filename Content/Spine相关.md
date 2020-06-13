@@ -20,7 +20,7 @@
 
 单击XXX_SkeletonData文件拖入到Hierarchy面板，
 
-![image-20200421150313914](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200421150313914.png)
+![image-20200421150313914](Assets/Spine相关/image-20200421150313914.png)
 
 需要Animator控制就选SkeletonMecanim，UI选第二个，正常通过SpineAPI管理就选第一个
 
@@ -38,29 +38,29 @@ SkeletonAnimation.state.Event += (state,e)=>
 
 ### Animator控制Spine动画
 
-<img src="upload/image-20200512142258189.png" alt="image-20200512142258189" style="zoom:50%;" />
+<img src="Assets/Spine相关/image-20200512142258189.png" alt="image-20200512142258189" style="zoom:50%;" />
 
 编辑相应的动画状态机
 
 ### Spine物体跟随
 
-![image-20200421155812624](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200421155812624.png)
+![image-20200421155812624](Assets/Spine相关/image-20200421155812624.png)
 
 新建空物体 增加该脚本
 
 ### Spine动画拆分层级
 
-![image-20200413161607638](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200413161607638.png)
+![image-20200413161607638](Assets/Spine相关/image-20200413161607638.png)
 
 添加该脚本
 
-![image-20200413161902320](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200413161902320.png)
+![image-20200413161902320](Assets/Spine相关/image-20200413161902320.png)
 
 增加这一栏 选择图层
 
 将动画分成俩个MeshRenderer
 
-![image-20200413163142559](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200413163142559.png)
+![image-20200413163142559](Assets/Spine相关/image-20200413163142559.png)
 
 修改这两层的layer即可
 
@@ -96,12 +96,12 @@ GetComponent<MeshRenderer>().SetPropertyBlock(mpb);
 
 并且颜色要跟美术对齐
 
-![image-20200421142939132](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200421142939132.png)
+![image-20200421142939132](Assets/Spine相关/image-20200421142939132.png)
 
-![image-20200421143015324](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200421143015324.png)
+![image-20200421143015324](Assets/Spine相关/image-20200421143015324.png)
 
 ### Spine神坑之Unity闪退
 
 可能是版本问题，项目使用的是unity2019.3.5以及spine3.8，如果在运行时查看spine动画的预览，会导致unity崩溃闪退，已经出现过多次这样的问题，所以记录一下，千万不要在unity运行时查看spine动画的预览！！
 
-![image-20200422183826294](Spine%E5%AD%A6%E4%B9%A0.assets/image-20200422183826294.png)
+![image-20200422183826294](Assets/Spine相关/image-20200422183826294.png)
