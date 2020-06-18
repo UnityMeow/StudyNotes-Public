@@ -1,5 +1,7 @@
 # DirectX12 3D 学习笔记
 
+[官网API文档](https://docs.microsoft.com/en-us/windows/win32/api/)
+
 [官方代码示例库](https://github.com/d3dcoder/d3d12book)
 
 ## 数学知识
@@ -135,6 +137,26 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   - 单位向量
 
     `XMVECTOR XM_CALLCONV XMVector3Normalize();`
+    
+  - 使用一个参考法线向量，将一个三维向量分成平行和垂直与法线的分量
+  
+    `XM_CALLCONV XMVector3ComponentsFromNormal(XMVECTOR* pParallel,  XMVECTOR* pPerpendicular,FXMVECTOR V,FXMVECTOR Normal);`
+  
+  - 返回两个向量之间的弧度
+  
+    `XMVECTOR XMVector3AngleBetweenVectors(FXMVECTOR v1, FXMVECTOR v2);`
+  
+  - 测试两个向量是否相等
+  
+    `XM_CALLCONV XMVector3Equal(FXMVECTOR V1, FXMVECTOR V2 );`
+  
+  - 测试两个向量是否不相等
+  
+    `XM_CALLCONV XMVector3NotEqual(FXMVECTOR V1, FXMVECTOR V2);`
+  
+  - 弧度转角度
+  
+    `XM_CONSTEXPR float XMConvertToDegrees(float fRadians);`
 
 ### 矩阵代数
 
@@ -152,7 +174,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
   - 只有行数列数相同的两个矩阵相加才有意义
 
-  - 标量乘法将一个标量依次与矩阵内的每个元素啊相乘
+  - 标量乘法将一个标量依次与矩阵内的每个元素相乘
 
   - 利用矩阵的加法和标量乘法可以定义矩阵减法
 
@@ -160,17 +182,46 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 #### 矩阵乘法
 
+- 横*竖
+
+- A * B   A的横向元素数与B的竖向元素数相等才有意义
+
+- 向量与矩阵的乘法是一种线性组合
+
 #### 转置矩阵
+
+- 原矩阵的行与列进行交换所得到的新矩阵
+- A + B的转置矩阵 = A的转置矩阵 + B的转置矩阵
+- n * A的转置矩阵 = n * A的转置矩阵
+- A * B的转置矩阵 = B的转置矩阵 * A的转置矩阵
+- A的转置矩阵的转置矩阵 = A
 
 #### 单位矩阵
 
+- 主对角线元素均为1，其它元素都为0的方阵
+- 单位矩阵是矩阵的乘法单位元
+- A * 单位矩阵 = A
+
 #### 矩阵行列式
 
-#### 伴随矩阵
+- 余子阵 一个n * n的矩阵去掉矩阵的第i行 第j列
+- 用来手推逆矩阵的
 
 #### 逆矩阵
 
+- 矩阵不存在除法概念，但定义了矩阵乘法的逆运算
+- 只有方阵才具有逆矩阵，但不是每个方阵都有逆矩阵
+- 存在逆矩阵的方阵为可逆矩阵，不存在逆矩阵的方阵为奇异矩阵
+- 可逆矩阵的逆矩阵是唯一的
+- 矩阵 * 矩阵的逆矩阵 = 矩阵的单位矩阵
+- B的逆矩阵 * A的逆矩阵 = A * B 的逆矩阵
+
 #### DirectXMath API 矩阵相关
+
+- 矩阵类型 XMMATRIX
+- XMMATRIX底层由4个XMVECTOR实例构成，并借此来使用SIMD技术
+- 建议用XMFLOAT4X4来存储来存储类中的矩阵类型数据成员
+- XMMATRIX 与 XMFLOAT4X4内存排列一致，对齐不一致，是可以进行内存拷贝的
 
 ### 变换
 
