@@ -219,9 +219,124 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 #### DirectXMath API 矩阵相关
 
 - 矩阵类型 XMMATRIX
+
 - XMMATRIX底层由4个XMVECTOR实例构成，并借此来使用SIMD技术
+
 - 建议用XMFLOAT4X4来存储来存储类中的矩阵类型数据成员
+
 - XMMATRIX 与 XMFLOAT4X4内存排列一致，对齐不一致，是可以进行内存拷贝的
+
+- 常用API
+
+  - 返回单位矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixIdentity();`
+
+  - 返回是否为单位矩阵
+
+    `bool XM_CALLCONV XMMatrixIsIdentity(FXMMATRIX M);`
+
+  - 返回矩阵的转置矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixTranspose(FXMMATRIX M);`
+
+  - 返回矩阵的行列式
+
+    `XMVECTOR XM_CALLCONV XMMatrixDeterminant(FXMMATRIX M);`
+
+  - 输入矩阵的行列式以及矩阵本身，返回矩阵的逆矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixInverse(XMVECTOR* pDeterminant, FXMMATRIX  M)`
+
+- 参数传递规则与XMVECTOR一致
 
 ### 变换
 
+#### 线性变换
+
+- 缩放矩阵
+
+  ```
+  x,0,0,0
+  0,y,0,0
+  0,0,z,0
+  0,0,0,1
+  ```
+
+- 旋转矩阵
+
+  ```c++
+  // 绕x轴旋转
+  1,0,0,0
+  0,c,s,0
+  0,-s,c,0
+  0,0,0,1
+  
+  // 绕y轴旋转
+  c,0,-s,0
+  0,1,0,0
+  s,0,c,0
+  0,0,0,1
+  
+  // 绕z轴旋转
+  c,s,0,0
+  -s,c,0,0
+  0,0,1,0
+  0,0,0,1
+  ```
+
+- 正交矩阵
+
+  矩阵的行向量都是规范正交，则该矩阵为正交矩阵，正交矩阵的逆矩阵与转置矩阵是相等的，所有的旋转矩阵都是正交矩阵
+
+#### 仿射变换
+
+- 由线性变换与平移变换组合而成
+
+- 向量的性质中没有位置这个概念
+
+- (x,y,z,0)表示向量    (x,y,z,1)表示点
+
+- 两点之差得的是一个向量，点与向量之和得到的是一个点
+
+- 平移矩阵
+
+  ```
+  1,0,0,0
+  0,1,0,0
+  0,0,1,0
+  x,y,z,1
+  ```
+
+#### 变换的复合
+
+矩阵之间的乘法运算不满足交换律，多种变换注意连乘顺序，顺序不同得到的结果是不同的
+
+#### 坐标系变换
+
+- 不同坐标系之间的坐标转换，在坐标系变换过程中几何体本身不会发生改变，改变的仅仅是参考坐标系
+- 通过逆矩阵可进行世界坐标与本地坐标的相互转换
+
+#### DirectXMath API  变换相关
+
+- 常用API
+
+  - 构建一个缩放矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixScaling(float ScaleX, float ScaleY, float ScaleZ);`
+
+  - 用一个3D向量来构建缩放矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixScalingFromVector(FXMVECTOR Scale);`
+
+  - 构建一个绕X轴旋转多少弧度的矩阵(YZ轴类似)
+
+    `XMMATRIX XM_CALLCONV XMMatrixRotationX(float Angle);`
+
+  - 构建平移矩阵
+
+    `XMMATRIX XM_CALLCONV XMMatrixTranslation(float OffsetX, float OffsetY, float OffsetZ);`
+
+- 可以直接用封装好的库
+
+ 
