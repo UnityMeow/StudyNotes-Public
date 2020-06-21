@@ -422,17 +422,64 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
     - `DXGI_FORMAT_D16_UNORM`
   - *模板缓冲区待学习*
 
-- 资源与描述符(视图)
+- 资源与描述符(descriptor)
 
-- 多重采样
+  - 在Direct3D中，资源不能直接与渲染流水线相绑定，在绘制调用时对其引用的资源去指定描述符
+  - 每个描述符都有一种具体类型，指明资源的具体作用
+    - CBV 缓冲区视图/SRV 着色器资源视图 /UAV  无序访问师傅
+    - sampler 采样器 表示采样器资源（用于纹理贴图）
+    - RTV 渲染目标视图资源
+    - DSV 深度/模板试图资源
+  - 可以把描述符对象看作GPU识别以及描述资源的一种轻量级结构体
+  - 同一种资源可以创建不同的描述符，借此可以将同一种资源绑定到渲染流水线的不同阶段
+  - 应用程序可以通过创建描述符堆(descriptor heap)来分配描述符的内存
 
-- 功能级别
+- 采样
 
-- DirectX图形基础结构
+  - 超级采样(SSAA)
+
+    图像颜色根据每一个子像素来计算
+
+  - 多重采样(MSAA)
+
+    求取图像颜色时每个像素只计算一次，对子像素求取平均值
+
+  - 时间采样(TemporalAA)
+
+    [大佬专栏](https://zhuanlan.zhihu.com/p/46841906)
+
+  最终目的是将三角形边缘的混合，也就是实现了抗锯齿的功能，目前基本使用时间采样较多
+
+- DirectX图形基础结构(DXGI)
+
+  配合Direct3D使用的API，使多种图形的API中所共有的底层任务能借助一组通用API来进行处理
+
+  引用头文件 ： `#include <dxgi1_4.h>`
 
 - 功能支持的检测
 
+  `ID3D12Device`是Direct3D中最重要的接口，可以看作是图形硬件设备的软件控制器，通过它来创建GPU资源以及其他用于控制图形硬件的特定接口
+
+  通过`ID3D12Device::CheckFeatureSupport();`进行各种功能的检测
+
+  原型：
+
+  ```c++
+  HRESULT STDMETHODCALLTYPE CheckFeatureSupport( 
+              D3D12_FEATURE Feature,
+              void *pFeatureSupportData,
+              UINT FeatureSupportDataSize)
+  ```
+
 - 资源驻留
+
+  - GPU memory 显存。GPU控制的显存相当于CPU控制的内存(系统内存 system memory)。CPU内部有多级缓存与寄存器，分别用于缓存指令、控制CPU，GPU内部也有缓存与寄存器，分别用于缓存纹理、缓存着色器指令等、控制GPU
+  - 由于显存空间有限，为了使应用程序占用最小的显存空间，Direct3D 12中，应用程序可控制资源在显存中的去留，主动管理资源的驻留情况(residency)
+  - 无论资源是否已经在显存中，都可进行管理
+  - Direct3D 11中由系统自动管理
+
+  - 程序应当避免在短时间内于显存中交换进出相同的资源，会引起过高开销
+  - 理想状态：清出的资源在短时间内不会再次使用
 
 #### CPU与GPU之间的交互
 
