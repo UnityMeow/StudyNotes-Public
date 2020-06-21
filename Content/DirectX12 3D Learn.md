@@ -1,5 +1,7 @@
 # DirectX12 3D 学习笔记
 
+[DirectX3D 12 编程指南](https://docs.microsoft.com/zh-cn/windows/win32/direct3d12/directx-12-programming-guide)
+
 [官网API文档](https://docs.microsoft.com/en-us/windows/win32/api/)
 
 [官方代码示例库](https://github.com/d3dcoder/d3d12book)
@@ -426,7 +428,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
   - 在Direct3D中，资源不能直接与渲染流水线相绑定，在绘制调用时对其引用的资源去指定描述符
   - 每个描述符都有一种具体类型，指明资源的具体作用
-    - CBV 缓冲区视图/SRV 着色器资源视图 /UAV  无序访问师傅
+    - CBV 常量缓冲区视图 / SRV 着色器资源视图 / UAV  无序访问视图
     - sampler 采样器 表示采样器资源（用于纹理贴图）
     - RTV 渲染目标视图资源
     - DSV 深度/模板试图资源
@@ -482,6 +484,11 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   - 理想状态：清出的资源在短时间内不会再次使用
 
 #### CPU与GPU之间的交互
+
+- 命令队列和命令列表
+- CPU与GPU之间的同步
+- 资源替换
+- 命令与多线程
 
 #### 初始化Direct3D
 
