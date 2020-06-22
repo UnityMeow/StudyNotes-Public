@@ -14,6 +14,15 @@
   }
   ```
 
+## 字符串相关
+
+```c#
+// string转ASCII码单字节数组
+byte[] a = Encoding.Default.GetBytes(str);
+```
+
+[Encoding官方文档](https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/character-encoding)
+
 ## NativeArray
 
   ```c++
