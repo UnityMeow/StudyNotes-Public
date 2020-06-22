@@ -362,7 +362,7 @@ std::cout << ptr->GetW() << std::endl;
 
 - ```c++
   // 这里x一定要转成int64有符号的 如果将int负数转为uint它将会是一个很大的整数，就会出问题 
-  DXMath::Max<int64>(0,(int64)x);	//限制最小为0 
+  DXMath::Max<int64>(0,(int64)x);	//限制最小为0
   ```
 
-  
+- const 统一放后面写 修饰的一定都是前面的
