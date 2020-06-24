@@ -1,5 +1,79 @@
 # Unity学习笔记
 
+## Editor相关
+
+```c#
+// 菜单栏
+// itemName：菜单名称路径 
+// isValidateFunction：不写为false，true则点击菜单前就会调用 
+// priority：菜单项显示排序 相邻的两个priority参数值相差>=11，则认为是不同组的，中间会有线分割显示
+[MenuItem(itemName = "Tool/Test", isValidateFunction = false, priority = 1)]
+private static void ToolMain()
+{
+	Debug.Log("test");
+}
+
+// 快捷键调用
+// _w W 
+// #w shift+w 
+// %w ctrl+w 
+// &w Alt+w
+[MenuItem("Tool/Test #w")]
+private static void ToolMain()
+{
+	Debug.Log("test");
+}
+
+// 组件添加菜单栏
+[MenuItem("GameObject/Meow", false,11)]
+private static void Meow()
+{
+   Debug.Log("Meow");
+}
+[MenuItem("Assets/Test", false, 11)]
+private static void Test()
+{
+    Debug.Log("1111");
+}
+
+// 获取当前选中的GameObject
+GameObject[] a = Selection.gameObjects;
+
+// 弹选择框
+int choice = EditorUtility.DisplayDialogComplex("标题", "描述", "选项", "选项", "选项");
+Debug.Log("选择的是：" + choice);
+
+// 弹窗
+EditorUtility.DisplayDialog("警告", "操作失误了", "确定");
+
+// 选择文件
+string path = EditorUtility.OpenFilePanel("选择文件", "", "");
+
+// 获取选中资源路径
+[MenuItem("Assets/喵：标记资源导出", false, 11)]
+private static void SetAssetExporter()
+{
+    string[] a = Selection.assetGUIDs;
+    for (int i = 0; i < a.Length; i++)
+    {
+        string assetPath = AssetDatabase.GUIDToAssetPath(a[i]);
+        Debug.Log(assetPath);
+    }        
+}
+
+```
+
+**HelpURL()**
+HelpURL（）提供一个自定义的文档链接，点击组件上的文档图标既能打开到你指定的链接，如下所示：
+
+```
+[HelpURL("http://www.baidu.com")]
+public class People : MonoBehaviour {
+    public string name;
+    public int age;
+}
+```
+
 ## DLL相关
 
 - 更新Unity中的DLL时必须关闭Unity后导入新DLL
