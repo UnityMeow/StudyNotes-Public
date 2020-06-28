@@ -74,6 +74,21 @@ public class People : MonoBehaviour {
 }
 ```
 
+[获取Unity生产的预览图](https://www.jianshu.com/p/02b80321bbae)
+
+[GUILayout](https://www.cnblogs.com/pepe/p/3490347.html)
+
+## 资源相关
+
+[资源机制](https://www.jianshu.com/p/ca5cb9d910c0)
+
+获取资源FileName
+
+```
+System.IO.Path.GetFileName(AssetDatabase.GUIDToAssetPath(GUID[i]));
+System.IO.Path.GetFileNameWithoutExtension(AssetDatabase.GUIDToAssetPath(GUID[i]));
+```
+
 ## DLL相关
 
 - 更新Unity中的DLL时必须关闭Unity后导入新DLL
