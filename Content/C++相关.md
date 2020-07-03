@@ -282,7 +282,25 @@ void Delete(T* pointer)
 }
 ```
 
+### 自动创建文件夹
 
+```c++
+void File::AutoCreatFolder(const vengine::string& path)
+{
+	vengine::vector<uint> index;
+	vengine::string fPath;
+	StringUtil::IndicesOf(path, '/', index);
+	for (uint i = 0; i < index.size(); ++i)
+	{
+		StringUtil::SubString(path, 0, (int64_t)index[i] + 1, fPath);
+		// 判断是否有这个文件夹 没有就新建一个
+		if (_access(fPath.c_str(), 6) == -1)
+		{
+			_mkdir(fPath.c_str());
+		}
+	}
+}
+```
 
 ## 智障喵注意事项
 
