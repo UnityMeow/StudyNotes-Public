@@ -355,7 +355,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
   - 使DirectX不受编程语言束缚，并且使之向后兼容的技术
 
-  - 通常将COM对象是为一种接口，可以把它当作一个C++类来使用
+  - 通常将COM对象视为一种接口，可以把它当作一个C++类来使用
 
   - 要获取指向某COM接口的指针，需要借助特定函数或另一COM接口的方法，而不是用C++的new去创建一个COM接口
 
@@ -486,8 +486,35 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 #### CPU与GPU之间的交互
 
 - 命令队列和命令列表
+
+  每个GPU至少维护一个命令队列(command queue), 通过Direct3D API CPU可以利用命令列表(command list)将命令提交到这个队列去
+
+  Direct3D12中 `ID3D12CommandQueue` 接口表示命令队列，`CreateCommandQueue`创建队列
+
+  `Microsoft::WRL::ComPtr <ID3D12CommandQueue> mCommandQueue;`
+
+  `ThrowIfFailed(dataPack.md3dDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&mCommandQueue)));`
+
+  结束记录命令，在提交命令列表之前一定要调用close
+
+  `cmdList->Close();`
+
+  将命令列表里的命令添加到命令队列之中
+
+  `mCommandQueue->ExecuteCommandLists(1/*lst中的命令列表数量*/, &lst/待执行的命令列表数组/);`
+
+  内存管理类接口，记录在命令列表内的命令`ID3D12CommandAllocator`,由ID3D12Devic接口来创建 
+
+  可以创建多个关联与同意命令分配器的命令列表，但不可同时记录命令，在一个列表记录命令时，必须关闭同一命令分配器的其他命令列表
+
+  当创建或重置同意命令列表时，会处于打开的状态，当尝试为同一个命令分配器连续创建两个命令列表时会报错，在没有确定GPU执行完命令分配器中的所有命令之前，千万不要重置命令分配器
+
 - CPU与GPU之间的同步
-- 资源替换
+
+  
+
+- 资源转换
+
 - 命令与多线程
 
 #### 初始化Direct3D
