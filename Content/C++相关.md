@@ -368,5 +368,42 @@ std::cout << ptr->GetW() << std::endl;
   // 这里x一定要转成int64有符号的 如果将int负数转为uint它将会是一个很大的整数，就会出问题 
   DXMath::Max<int64>(0,(int64)x);	//限制最小为0
   ```
+------
 
 - const 统一放后面写 修饰的一定都是前面的
+
+------
+
+```C++
+void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint64_t size, vengine::string& result)
+{
+	// 安全检测放到Debug模式中，release追求性能所以不要安全检测
+#if defined(DEBUG) || defined(_DEBUG)
+	if (startIndex + size > str.size())
+		throw "Out of Range!";
+#endif
+	result.clear();
+    // 避免大小不够大
+	result.resize(size);
+    // 重点：只要不是基础数据类型 是自定义类型的类都不要直接取地址去操作
+    // 点过去看相应的数据指针地址
+    // 错误：&result  正确result.data()
+	memcpy(result.data(), str.data() + startIndex * sizeof(char), size * sizeof(char));
+}
+```
+
+------
+
+- 报错出现无法解析 多半为头文件和源文件没对上或者#include没包含上，仔细检查一下
+
+------
+
+- 工具类不要直接写全局函数，容易出问题，写成静态函数
+
+------
+
+- StringUtil    字符串相关
+
+-------
+
+- 自动引用头文件的时候记得看一下引用的是.cpp还是.h

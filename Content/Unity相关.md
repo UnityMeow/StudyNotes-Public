@@ -82,6 +82,8 @@ public class People : MonoBehaviour {
 
 [资源机制](https://www.jianshu.com/p/ca5cb9d910c0)
 
+[unity资源相关](https://www.cnblogs.com/twjcnblog/p/5673309.html)
+
 获取资源FileName
 
 ```
@@ -158,6 +160,22 @@ transform.up 在世界坐标系中表示物体正上方
 - unsafe关键字表示不安全上下文，类型或成员的整个正文范围均被视为不安全上下文，在该范围内可使用指针
 - fixed 语句禁止垃圾回收器重定位可移动的变量，只能出现在不安全的上下文中，但由于unity使用Boehm GC，不会移动object的内存位置，暂时可以不用管
 - UnsafeUtility.MemCpy()	C#中的内存拷贝API
+
+## RequireComponent
+
+RequireComponent属性自动将所需的组件添加为依赖项，避免设置错误
+
+```c#
+[RequireComponent(typeof(TextureExporter))]
+[RequireComponent(typeof(MaterialExporter))]
+[RequireComponent(typeof(MeshExporter))]
+public unsafe class SceneExporter : MonoBehaviour
+{
+
+}
+```
+
+
 
 ## MipMap
 
