@@ -61,6 +61,28 @@ private static void SetAssetExporter()
     }        
 }
 
+// 编辑器update
+[ExecuteInEditMode]
+public class XXXX : MonoBehaviour
+{
+    private void OnEnable()
+    {
+#if UNITY_EDITOR
+    	UnityEditor.EditorApplication.update += UpdatePerFrame;
+#endif
+    }
+    private void OnDisable()
+    {
+#if UNITY_EDITOR
+    	UnityEditor.EditorApplication.update -= UpdatePerFrame;
+#endif
+    }
+    private void UpdatePerFrame()
+    {
+        
+    }
+}
+
 ```
 
 **HelpURL()**
