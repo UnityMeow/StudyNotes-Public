@@ -425,3 +425,24 @@ void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint
 -------
 
 - 自动引用头文件的时候记得看一下引用的是.cpp还是.h
+
+-----
+
+- C#的char**
+
+  [官方解释](https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/language-specification/unsafe-code#pointer-types)
+
+  在指针类型中 `*` 之前指定的类型称为指针类型的***引用类型***。 它表示指针类型值指向的变量的类型。
+
+  不同于引用（引用类型的值）时，不会由垃圾回收器跟踪指针-垃圾回收器不知道指针及其指向的数据。 出于此原因，不允许指针指向引用或包含引用的结构，并且指针的引用类型必须是*unmanag*_type
+
+  ```c#
+  NativeArray<ulong> test = new NativeArray<ulong>(3, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+  test[0] = (ulong)(meshGUID.Ptr());
+  test[1] = (ulong)(meshGUID.Ptr());
+  test[2] = (ulong)(meshGUID.Ptr());
+  jrd.meshGUID = (char**)test.Ptr();
+  ```
+
+  
+

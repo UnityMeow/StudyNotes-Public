@@ -1,5 +1,7 @@
 # Unity学习笔记
 
+PrimitiveType.Cube
+
 ## Editor相关
 
 ```c#
@@ -82,6 +84,9 @@ public class XXXX : MonoBehaviour
         
     }
 }
+
+// 编辑器窗口相机
+SceneView.lastActiveSceneView.camera.transform;
 
 ```
 
