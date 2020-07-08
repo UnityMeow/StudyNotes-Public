@@ -88,6 +88,21 @@ public class XXXX : MonoBehaviour
 // 编辑器窗口相机
 SceneView.lastActiveSceneView.camera.transform;
 
+// 自定义Component Inspector面板修改
+[CustomEditor(typeof(XXX))]
+public class XXXEditor : Editor
+{
+    private XXX test;
+    private void OnEnable()
+    {
+        test = (XXX)base.target;
+    }
+    public override void OnInspectorGUI()
+    {
+        
+    }
+}
+
 ```
 
 **HelpURL()**
