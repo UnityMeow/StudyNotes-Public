@@ -93,15 +93,46 @@ SceneView.lastActiveSceneView.camera.transform;
 public class XXXEditor : Editor
 {
     private XXX test;
+    // 用于以完全通用的方式编辑对象上的属性，可以自动处理撤销和为预置的UI设置样式
+	private SerializedProperty spXX;
+    
     private void OnEnable()
     {
         test = (XXX)base.target;
+        spXX = serializedObject.FindProperty("XXX类里的属性变量名");
     }
     public override void OnInspectorGUI()
     {
-        
+        // 显示相应属性
+        EditorGUILayout.PropertyField(spXX, new GUIContent("属性说明"));
+        // 如果属性是数组
+        if (spXX.isArray)
+        {
+            for (int i = 0; i < spXX.arraySize; i++)
+            {
+                SerializedProperty spXXp = spXX.GetArrayElementAtIndex(i);
+                if (spXXp != null)
+                {
+                    SerializedProperty spXXpp = spXXp.FindPropertyRelative("XX");
+                    if (spXXpp != null)
+                    {
+                        // TODO
+                    }
+                }
+            }
+        }
+        // 滑动条
+        tempdis = EditorGUILayout.Slider(tempdis, 0F, maxDis);
+        // 浮点数
+        tempdis = EditorGUILayout.FloatField(maxDis, GUILayout.Width(50));
+        // 应用修改的属性 一定要加
+        serializedObject.ApplyModifiedProperties();
     }
 }
+// 样式选择
+GUILayout.Label("", EditorStyles.XXX);
+
+
 
 ```
 
@@ -119,6 +150,8 @@ public class People : MonoBehaviour {
 [获取Unity生产的预览图](https://www.jianshu.com/p/02b80321bbae)
 
 [GUILayout](https://www.cnblogs.com/pepe/p/3490347.html)
+
+[Customize the Unity Editor with UIElements!](https://www.youtube.com/watch?v=CZ39btQ0XlE)
 
 ## 资源相关
 
