@@ -1,6 +1,4 @@
-# Unity学习笔记
-
-PrimitiveType.Cube
+# Unity Learn
 
 ## Editor相关
 
@@ -131,8 +129,6 @@ public class XXXEditor : Editor
 }
 // 样式选择
 GUILayout.Label("", EditorStyles.XXX);
-
-
 
 ```
 
@@ -288,6 +284,10 @@ https://mp.weixin.qq.com/s/qWjvI1xkS31sGLhBi1JzbA
 动态批处理：一切都是自动的，不需要做任何操作，而且物体是可以移动的，但是限制很多。
 
 静态批处理：自由度很高，限制很少，缺点可能会占用更多的内存，而且经过静态批处理后的所有物体都不可以再移动了。
+
+## Mesh
+
+PrimitiveType.Cube 
 
 ## Shader相关
 

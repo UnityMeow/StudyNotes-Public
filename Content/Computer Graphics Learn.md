@@ -1,4 +1,4 @@
-# 计算机图形学
+# Computer Graphics Learn
 
 > 计算机图形学(Computer Graphics，简称CG)
 >

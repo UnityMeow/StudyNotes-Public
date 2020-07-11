@@ -1,4 +1,6 @@
-# DirectX12 3D 学习笔记
+# DirectX12 3D Learn
+
+*学习参考书籍《DirectX12 3D 游戏开发实战》*
 
 [DirectX3D 12 编程指南](https://docs.microsoft.com/zh-cn/windows/win32/direct3d12/directx-12-programming-guide)
 
