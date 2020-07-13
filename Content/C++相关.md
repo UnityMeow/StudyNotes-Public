@@ -444,5 +444,11 @@ void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint
   jrd.meshGUID = (char**)test.Ptr();
   ```
 
-  
+- 如果引用的头文件的cpp不在项目文件夹里，要导进来， 否则会无法解析
+
+  `#include "../../Common/d3dUtil.h"`
+
+## VS扩展
+
+![image-20200713222110994](Asset/C++%E7%9B%B8%E5%85%B3/image-20200713222110994.png)
 
