@@ -319,14 +319,77 @@ void CreateDSV(ComPtr<ID3D12DescriptorHeap>& dsvHeap, D3D12_FEATURE_DATA_MULTISA
 	// 创建深度模板缓存 资源
 	ComPtr<ID3D12Resource> depthStencilBuffer;
 	// 将深度模板数据提交至GPU显存中
-	d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),	//堆类型为默认堆（不能写入）
-		D3D12_HEAP_FLAG_NONE,	//Flag
-		&dsvResourceDesc,	//上面定义的DSV资源描述符指针
-		D3D12_RESOURCE_STATE_COMMON,	//资源的状态为初始状态
-		&optClear,	//上面定义的优化值指针
+	d3dDevice->CreateCommittedResource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),	// 堆类型为默认堆（不能写入）
+		D3D12_HEAP_FLAG_NONE,	// Flag
+		&dsvResourceDesc,	// 上面定义的DSV资源描述符指针
+		D3D12_RESOURCE_STATE_COMMON,	// 资源的状态为初始状态
+		&optClear,	// 上面定义的优化值指针
 		IID_PPV_ARGS(&depthStencilBuffer));
 
 	d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(),
-		nullptr,	//D3D12_DEPTH_STENCIL_VIEW_DESC类型指针，可填&dsvDesc（见上注释代码),由于在创建深度模板资源时已经定义深度模板数据属性，所以这里可以指定为空指针
-		dsvHeap->GetCPUDescriptorHandleForHeapStart());	//DSV句柄
+		nullptr,	// D3D12_DEPTH_STENCIL_VIEW_DESC类型指针，可填&dsvDesc（见上注释代码),由于在创建深度模板资源时已经定义深度模板数据属性，所以这里可以指定为空指针
+		dsvHeap->GetCPUDescriptorHandleForHeapStart());	// DSV句柄
+}
+
+/// <summary>
+/// 标记Ds资源状态
+/// </summary>
+void SetDsStatus(ComPtr<ID3D12GraphicsCommandList>& cmdList, ComPtr<ID3D12Resource> depthStencilBuffer)
+{
+	cmdList->ResourceBarrier(1,	// Barrier屏障个数
+		&CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+			D3D12_RESOURCE_STATE_COMMON,	// 转换前状态（创建时的状态，即CreateCommittedResource函数中定义的状态）
+			D3D12_RESOURCE_STATE_DEPTH_WRITE));	// 转换后状态为可写入的深度图，还有一个D3D12_RESOURCE_STATE_DEPTH_READ是只可读的深度图
+}
+
+/// <summary>
+/// 命令从命令列表传入命令队列
+/// CPU传入GPU
+/// </summary>
+void ExecuteComList(ComPtr<ID3D12GraphicsCommandList>& cmdList, ComPtr<ID3D12CommandQueue> cmdQueue)
+{
+	cmdList->Close();	// 命令添加完后将其关闭
+	ID3D12CommandList* cmdLists[] = { cmdList.Get() };	// 声明并定义命令列表数组
+	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);	// 将命令从命令列表传至命令队列
+}
+
+/// <summary>
+/// 实现CPU和GPU同步
+/// </summary>
+void FlushCmdQueue(ComPtr<ID3D12CommandQueue> cmdQueue, ComPtr<ID3D12Fence>& fence)
+{
+	int mCurrentFence = 0;	// 初始CPU上的Fence值为0
+	mCurrentFence++;	// CPU传完命令并关闭后，将当前Fence值+1
+	cmdQueue->Signal(fence.Get(), mCurrentFence);	// 当 GPU 处理完 CPU 传入的命令后，将 fence接口中 的fence+1，即fence->GetCompletedValue()+1
+
+	if (fence->GetCompletedValue() < mCurrentFence)	// 如果小于，说明 GPU 没有处理完所有命令
+	{
+		HANDLE eventHandle = CreateEvent(nullptr, false, false, L"FenceSetDone");	//创建事件
+		fence->SetEventOnCompletion(mCurrentFence, eventHandle);// 当fence达到 mCurrentFence值（即执行到Signal（）指令修改了fence值）时触发的eventHandle事件
+		WaitForSingleObject(eventHandle, INFINITE);// 等待GPU命中fence，触发事件（阻塞当前线程直到事件触发，注意此Enent需先设置再等待，
+							   // 如果没有Set就Wait，就死锁了，Set永远不会调用，所以也就没线程可以唤醒这个线程）
+		CloseHandle(eventHandle);
+	}
+}
+
+/// <summary>
+/// 设置视口和裁剪矩形
+/// </summary>
+void CreateViewPortAndScissorRect()
+{
+	D3D12_VIEWPORT viewPort;
+	D3D12_RECT scissorRect;
+	// 视口设置
+	viewPort.TopLeftX = 0;
+	viewPort.TopLeftY = 0;
+	viewPort.Width = 1280;
+	viewPort.Height = 720;
+	viewPort.MaxDepth = 1.0f;
+	viewPort.MinDepth = 0.0f;
+	// 裁剪矩形设置（矩形外的像素都将被剔除）
+	// 前两个为左上点坐标，后两个为右下点坐标
+	scissorRect.left = 0;
+	scissorRect.top = 0;
+	scissorRect.right = 1280;
+	scissorRect.bottom = 720;
 }
