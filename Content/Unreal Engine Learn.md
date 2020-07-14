@@ -293,7 +293,7 @@ https://docs.unrealengine.com/en-US/API/Runtime/Engine/Engine/UWorld/index.html
 
 - **Actor生命周期**
 
-  构造函数 -> 初始化成员变量 -> 如果在蓝图有延展，则初始化蓝图数据 -> 构建组件 -> BeginPlay(标志着Actor被创建到世界中) -> Tick
+  构造函数 -> 初始化成员变量 -> 如果在蓝图有延展，则初始化蓝图数据 -> 构建组件 -> BeginPlay(标志着Actor被创建到世界中) -> Tick(每帧都会执行)
 
 - **新建Actor类**
 
