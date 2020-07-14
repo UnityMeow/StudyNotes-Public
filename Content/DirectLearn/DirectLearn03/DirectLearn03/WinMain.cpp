@@ -20,6 +20,7 @@
 #include <comdef.h>
 #include "../../Common/d3dx12.h"
 #include "../../Common/d3dUtil.h"
+#include "../../Common/GameTimer.h"
 
 using namespace Microsoft::WRL;
 
@@ -59,6 +60,8 @@ UINT mCurrentBackBuffer = 0;
 // MSAA质量等级
 D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS MSAAQL;
 
+GameTimer gt;
+
 void CreateDevice();
 void CreateFence();
 void GetDescriptorSize();
@@ -92,6 +95,30 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	//将上面没有处理的消息转发给默认的窗口过程
 	return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+
+void CalculateFrameState()
+{
+	static int frameCnt = 0;	//总帧数
+	static float timeElapsed = 0.0f;	//流逝的时间
+	frameCnt++;	//每帧++，经过一秒后其即为FPS值
+	//判断模块
+	if (gt.TotalTime() - timeElapsed >= 1.0f)	//一旦>=0，说明刚好过一秒
+	{
+		float fps = (float)frameCnt;//每秒多少帧
+		float mspf = 1000.0f / fps;	//每帧多少毫秒
+
+		std::wstring fpsStr = std::to_wstring(fps);//转为宽字符
+		std::wstring mspfStr = std::to_wstring(mspf);
+		//将帧数据显示在窗口上
+		std::wstring windowText = L"DirectXMeow    fps:" + fpsStr + L"    " + L"mspf" + mspfStr;
+		SetWindowText(mhMainWnd, windowText.c_str());
+
+		//为计算下一组帧数值而重置
+		frameCnt = 0;
+		timeElapsed += 1.0f;
+	}
 }
 
 // 将各种资源设置到渲染流水线上,并最终发出绘制命令
@@ -229,7 +256,10 @@ int Run()
 	// 消息循环
 	// 定义消息结构体
 	MSG msg = { 0 };
-	
+
+	//每次循环开始都要重置计时器
+	gt.Reset();
+
 	// 如果GetMessage函数不等于0，说明没有接受到WM_QUIT
 	while (msg.message != WM_QUIT)
 	{
@@ -242,7 +272,10 @@ int Run()
 		else
 		{
 			// 否则就执行动画和游戏逻辑
-			Draw();
+			
+				CalculateFrameState();
+				gt.Tick();
+				Draw();
 		}
 	}
 	return (int)msg.wParam;
