@@ -521,7 +521,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 #### 初始化Direct3D
 
-![Direct窗口初始化](Assets/DirectX12 3D Learn/Direct窗口初始化.png)
+![DirectWindowInit](Assets/DirectX12 3D Learn/DirectWindowInit.png)
 
 #### 计时与动画
 
