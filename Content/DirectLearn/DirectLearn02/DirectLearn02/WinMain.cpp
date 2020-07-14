@@ -20,7 +20,6 @@
 #include <comdef.h>
 #include "../../Common/d3dx12.h"
 #include "../../Common/d3dUtil.h"
-#include "../../Common/GameTimer.h"
 
 using namespace Microsoft::WRL;
 
@@ -72,14 +71,13 @@ void CreateDSV();
 void CreateViewPortAndScissorRect();
 void FlushCmdQueue();
 
-//某个窗口的句柄，ShowWindow和UpdateWindow函数均要调用此句柄
+// 某个窗口的句柄，ShowWindow和UpdateWindow函数均要调用此句柄
 HWND mhMainWnd = 0;
-//窗口过程函数的声明,HWND是主窗口句柄
+// 窗口过程函数的声明,HWND是主窗口句柄
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam);
 
-/// <summary>
-/// 窗口过程函数
-/// </summary>
+
+// 窗口过程函数
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	//消息处理
@@ -96,9 +94,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-/// <summary>
-/// 将各种资源设置到渲染流水线上,并最终发出绘制命令
-/// </summary>
+// 将各种资源设置到渲染流水线上,并最终发出绘制命令
 void Draw()
 {
 	ThrowIfFailed(cmdAllocator->Reset());// 重复使用记录 命令 的相关内存
@@ -147,9 +143,7 @@ void Draw()
 	FlushCmdQueue();
 }
 
-/// <summary>
-/// 初始化窗口
-/// </summary>
+// 初始化窗口
 bool InitWindow(HINSTANCE hInstance, int nShowCmd)
 {
 	//窗口初始化描述结构体(WNDCLASS)
@@ -196,9 +190,7 @@ bool InitWindow(HINSTANCE hInstance, int nShowCmd)
 	return 1;
 }
 
-/// <summary>
-/// 初始化DX
-/// </summary>
+// 初始化DX
 bool InitDirect3D()
 {
 	CreateDevice();
@@ -230,9 +222,8 @@ bool Init(HINSTANCE hInstance, int nShowCmd)
 		return true;
 	}
 }
-/// <summary>
-/// 消息循环
-/// </summary>
+
+// 消息循环
 int Run()
 {
 	// 消息循环
@@ -276,11 +267,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 	}
 }
 
-
-
-/// <summary>
-/// 创建设备
-/// </summary>
+// 创建设备
 void CreateDevice()
 {
 	ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&DXGIFac)));
@@ -290,19 +277,15 @@ void CreateDevice()
 		IID_PPV_ARGS(&d3dDevice)));	// 返回所建设备
 }
 
-/// <summary>
-/// 创建Fence 为了CPU与GPU进行同步
-/// 类似与多线程的互斥锁mutex
-/// </summary>
+// 创建Fence 为了CPU与GPU进行同步
+// 类似与多线程的互斥锁mutex
 void CreateFence()
 {
 	ThrowIfFailed(d3dDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence)));
 }
 
-/// <summary>
-/// 获取描述符大小
-/// 方便之后在地址中做偏移来找到堆中的描述符元素
-/// </summary>
+// 获取描述符大小
+// 方便之后在地址中做偏移来找到堆中的描述符元素
 void GetDescriptorSize()
 {
 	// 渲染目标缓冲区描述符
@@ -313,9 +296,7 @@ void GetDescriptorSize()
 	CbvSrvUavDesSize = d3dDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-/// <summary>
-/// 设置MSAA抗锯齿属性
-/// </summary>
+// 设置MSAA抗锯齿属性
 void SetMSAA()
 {
 	// 初始化多重采样属性
@@ -331,9 +312,7 @@ void SetMSAA()
 	d3dDevice->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &MSAAQL, sizeof(MSAAQL));
 }
 
-/// <summary>
-/// 创建命令队列、命令列表和命令分配器
-/// </summary>
+// 创建命令队列、命令列表和命令分配器
 void CreateCommandObject()
 {
 	// 初始化命令描述符
@@ -354,10 +333,8 @@ void CreateCommandObject()
 	cmdList->Close();
 }
 
-/// <summary>
-/// 创建交换链
-/// 交换链存着渲染目标资源（后台缓冲区资源）
-/// </summary>
+// 创建交换链
+// 交换链存着渲染目标资源（后台缓冲区资源）
 void CreateSwapChain()
 {
 	swapChain.Reset();
@@ -385,10 +362,8 @@ void CreateSwapChain()
 		swapChain.GetAddressOf());		// 交换链地址
 }
 
-/// <summary>
-/// 创建描述符堆
-/// 描述符堆是存放描述符的一段连续内存空间
-/// </summary>
+// 创建描述符堆
+// 描述符堆是存放描述符的一段连续内存空间
 void CreateDescriptorHeap()
 {
 	// 初始化RTV描述符堆描述符
@@ -412,9 +387,7 @@ void CreateDescriptorHeap()
 	d3dDevice->CreateDescriptorHeap(&dsvDescriptorHeapDesc, IID_PPV_ARGS(&dsvHeap));
 }
 
-/// <summary>
-/// 创建RTV描述符
-/// </summary>
+// 创建RTV描述符
 void CreateRTV()
 {
 	// 这个变体类在d3dx12.h头文件中定义，DX库并没有集成
@@ -435,9 +408,7 @@ void CreateRTV()
 	}
 }
 
-/// <summary>
-/// 创建DSV描述符
-/// </summary>
+// 创建DSV描述符
 void CreateDSV()
 {
 	// 在CPU中创建好深度模板数据资源
@@ -473,9 +444,7 @@ void CreateDSV()
 		dsvHeap->GetCPUDescriptorHandleForHeapStart());	// DSV句柄
 }
 
-/// <summary>
-/// 标记Ds资源状态
-/// </summary>
+// 标记Ds资源状态
 void SetDsStatus()
 {
 	cmdList->ResourceBarrier(1,	// Barrier屏障个数
@@ -484,10 +453,8 @@ void SetDsStatus()
 			D3D12_RESOURCE_STATE_DEPTH_WRITE));	// 转换后状态为可写入的深度图，还有一个D3D12_RESOURCE_STATE_DEPTH_READ是只可读的深度图
 }
 
-/// <summary>
-/// 命令从命令列表传入命令队列
-/// CPU传入GPU
-/// </summary>
+// 命令从命令列表传入命令队列
+// CPU传入GPU
 void ExecuteComList()
 {
 	cmdList->Close();	// 命令添加完后将其关闭
@@ -495,9 +462,7 @@ void ExecuteComList()
 	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);	// 将命令从命令列表传至命令队列
 }
 
-/// <summary>
-/// 实现CPU和GPU同步
-/// </summary>
+// 实现CPU和GPU同步
 void FlushCmdQueue()
 {
 	int mCurrentFence = 0;	// 初始CPU上的Fence值为0
@@ -514,9 +479,7 @@ void FlushCmdQueue()
 	}
 }
 
-/// <summary>
-/// 设置视口和裁剪矩形
-/// </summary>
+// 设置视口和裁剪矩形
 void CreateViewPortAndScissorRect()
 {
 	// 视口设置
