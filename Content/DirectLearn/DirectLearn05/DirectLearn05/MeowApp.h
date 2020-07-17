@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "D3D12App.h"
 #include <DirectXPackedVector.h>
+#include "../../Common/UploadBuffer.h"
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
@@ -10,13 +11,9 @@ struct Vertex
 	XMCOLOR Color;
 };
 
-//单个物体的常量数据
 struct ObjectConstants
 {
-	//初始化物体空间变换到裁剪空间矩阵，Identity4x4是单位矩阵，需要包含MathHelper头文件
-	XMFLOAT4X4 worldViewProj = MathHelper::Identity4x4();
-	float gTime = 0.0f;
-	XMFLOAT4 gPulseColor;
+	XMFLOAT4 testColor;
 };
 
 class MeowApp : public D3D12App
@@ -24,9 +21,9 @@ class MeowApp : public D3D12App
 	// 顶点数据
 	std::array<Vertex, 3> vertices =
 	{
-		Vertex({ XMFLOAT3(-1,-1,1), XMCOLOR(Colors::Red) }),
-		Vertex({ XMFLOAT3(0.5,1,1), XMCOLOR(Colors::Green) }),
-		Vertex({ XMFLOAT3(1,-1,1), XMCOLOR(Colors::Blue) }),
+		Vertex({ XMFLOAT3(-1,-1,0.5), XMCOLOR(Colors::Red) }),
+		Vertex({ XMFLOAT3(0,1,0.5), XMCOLOR(Colors::Green) }),
+		Vertex({ XMFLOAT3(1,-1,0.5), XMCOLOR(Colors::Blue) }),
 	};
 	// 索引数据
 	std::array<std::uint16_t, 3> indices =
@@ -45,9 +42,16 @@ class MeowApp : public D3D12App
 
 	ComPtr<ID3D12Resource> vertexBufferUploader = nullptr;	// GPU上传堆中的顶点缓冲区
 	ComPtr<ID3D12Resource> indexBufferUploader = nullptr;	// GPU上传堆中的索引缓冲区
-	
+	std::vector<D3D12_INPUT_ELEMENT_DESC> mInputLayout;
 	// 根签名
 	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	// CBV
+	ComPtr<ID3D12DescriptorHeap> cbvHeap = nullptr;
+	std::unique_ptr<UploadBuffer<ObjectConstants>> objCB = nullptr;
+	ComPtr<ID3D12PipelineState> PSO = nullptr;
+
+	ComPtr<ID3DBlob> mvsByteCode = nullptr;
+	ComPtr<ID3DBlob> mpsByteCode = nullptr;
 
 public:
 	MeowApp();
@@ -56,8 +60,11 @@ public:
 private:
 	virtual void Draw()override;
 	// 创建常量缓冲区描述符CBV
-	// void CreateConstantBufferView();
+	void CreateConstantBufferView();
+	// 构建根签名
 	void BuildRootSignature();
+	// 输入布局描述和编译着色器字节码
+	void BuildShadersAndInputLayout();
 	// 构建几何体
 	void BuildTriangle();
 	// 构建PSO

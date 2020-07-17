@@ -546,6 +546,18 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 ### Direct3D绘制几何体
 
+#### 根签名 - RootSignature
+
+将着色器需要用到的数据绑定到对应的寄存器(register)槽上，供着色器访问
+
+#### CBV常量缓冲区描述符 - ConstantBufferView
+
+常量缓冲区需要描述符来指定缓冲区中资源的属性，这个描述符是需要创建描述符堆来存放（和RTV,DSV类似）
+
+#### 着色器
+
+[https://www.cnblogs.com/X-Jun/p/12246859.html#_label6](通用着色器核心)
+
 ### 光照
 
 ### 纹理贴图
