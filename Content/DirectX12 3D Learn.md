@@ -539,16 +539,17 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 ![image-20200715215025055](Assets/DirectX12 3D Learn/image-20200715215025055.png)
 
-- 主要阶段：应用阶段、几何阶段、光栅化阶段
-- 应用阶段：
-- 几何阶段：
-- 光栅化阶段：
-
 ### Direct3D绘制几何体
 
 #### 根签名 - RootSignature
 
 将着色器需要用到的数据绑定到对应的寄存器(register)槽上，供着色器访问
+
+- RootDescriptorTable 根描述符表
+- RootConstant 根常量
+- RootDescriptor 根描述符
+
+根签名必须要有，但如果没有用到常量数据，CBV为空则不需要设置根描述符表
 
 #### CBV常量缓冲区描述符 - ConstantBufferView
 
@@ -556,7 +557,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 #### 着色器
 
-[https://www.cnblogs.com/X-Jun/p/12246859.html#_label6](通用着色器核心)
+[通用着色器核心](https://www.cnblogs.com/X-Jun/p/12246859.html#_label6)
 
 ### 光照
 
