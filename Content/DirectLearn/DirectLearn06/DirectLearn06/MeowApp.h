@@ -30,7 +30,7 @@ class MeowApp : public D3D12App
 	{
 		0,1,2
 	};
-
+#pragma region 其它顶点索引数据
 	// 立方体
 	// 顶点数据
 	//std::array<Vertex, 8> vertices =
@@ -85,7 +85,7 @@ class MeowApp : public D3D12App
 	//{
 	//	0,1,2,0,2,3
 	//};
-	
+#pragma endregion
 	// 获取顶点、索引 数据大小
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);

@@ -552,7 +552,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 [通用着色器核心](https://www.cnblogs.com/X-Jun/p/12246859.html#_label6)
 
-#### 绘制命令
+#### 绘制函数
 
 将各种资源设置到渲染管线上，并最终发出绘制命令
 
@@ -610,9 +610,36 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   	&dsvHandle);	//指向DSV的指针
   ```
 
-- 1
+- 渲染完成，将后台缓冲区状态改为呈现状态
 
-- 1
+  ```c++
+  cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),
+  		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));// 从渲染目标到呈现
+  // 完成命令后记得关闭命令列表
+  ThrowIfFailed(cmdList->Close());
+  ```
+
+- CPU将命令准备好后，将待执行命令列表加入GPU的命令队列
+
+  ```c++
+  ID3D12CommandList* commandLists[] = { cmdList.Get() };// 声明并定义命令列表数组
+  cmdQueue->ExecuteCommandLists(_countof(commandLists), commandLists);// 将命令从命令列表传至命令队列
+  ```
+
+- 交换前后台缓冲区索引
+
+  ```C++
+  // 交换前后台缓冲区索引
+  ThrowIfFailed(swapChain->Present(0, 0));
+  // 1变0，0变1，为了让后台缓冲区索引永远为0
+  ref_mCurrentBackBuffer = (ref_mCurrentBackBuffer + 1) % 2;
+  ```
+
+- 设置fence值，刷新命令队列，使CPU和GPU同步
+
+  ```c++
+  FlushCmdQueue();
+  ```
 
 #### 三角形绘制
 
@@ -622,21 +649,23 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   // 顶点数据结构
   struct Vertex
   {
-  	XMFLOAT3 Pos;
-  	XMFLOAT4 Color;
+      XMFLOAT3 Pos;
+      // 传的Color必须是XMFLOAT4类型数据
+      // 传XMCOLOR会有问题
+      XMFLOAT4 Color;
   };
   // 顶点数据
   std::array<Vertex, 3> vertices =
   {
-  	Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
-  	Vertex({ XMFLOAT3(0.0f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
-  	Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
+      Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
+      Vertex({ XMFLOAT3(0.0f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
+      Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
   };
   // 索引数据
   // 索引要按顺时针来排列
   std::array<std::uint16_t, 3> indices =
   {
-  	0,1,2
+      0,1,2
   };
   ```
 
@@ -648,7 +677,105 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
   ```
 
-- 
+- (绘制前)构建根签名
+
+  ```c++
+  //根参数可以是描述符表、根描述符、根常量
+  CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+  //创建由单个CBV所组成的描述符表
+  CD3DX12_DESCRIPTOR_RANGE cbvTable;
+  cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, //描述符类型
+                1, //描述符数量
+                0);//描述符所绑定的寄存器槽号
+  slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+  //根签名由一组根参数构成
+  CD3DX12_ROOT_SIGNATURE_DESC rootSig(0, //根参数的数量 （不使用CBV 没有根参数填0）
+                                      slotRootParameter, //根参数指针
+                                      0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+  //用单个寄存器槽来创建一个根签名，该槽位指向一个仅含有单个常量缓冲区的描述符区域
+  ComPtr<ID3DBlob> serializedRootSig = nullptr;
+  ComPtr<ID3DBlob> errorBlob = nullptr;
+  HRESULT hr = D3D12SerializeRootSignature(&rootSig, D3D_ROOT_SIGNATURE_VERSION_1, &serializedRootSig, &errorBlob);
+  
+  if (errorBlob != nullptr)
+  {
+      OutputDebugStringA((char*)errorBlob->GetBufferPointer());
+  }
+  ThrowIfFailed(hr);
+  
+  ThrowIfFailed(d3dDevice->CreateRootSignature(0,
+                                               serializedRootSig->GetBufferPointer(),
+                                               serializedRootSig->GetBufferSize(),
+                                               IID_PPV_ARGS(&rootSignature)));
+  }
+  ```
+
+- (绘制前)输入布局描述和编译着色器字节码
+
+  在DX中，着色器程序必须先被编译成一种可移植的字节码，之后图形驱动程序才能将其编译成针对当前系统GPU所优化的本地指令，着色器编译有多种方式，暂时使用运行时加载，可以直接调用d3dUtil库中封装好的函数
+
+  ```c++
+  // 对应hlsl里的VertexOut VertXXX(VertexIn vin);
+  mvsByteCode = d3dUtil::CompileShader(L"XXXX.hlsl", nullptr, "VertXXX", "vs_5_1");
+  // 对应hlsl里的float4 PixelXXX(VertexOut pin) : SV_Target0 /*SV_Target0 系统值语义 这里修饰float4*/
+  mpsByteCode = d3dUtil::CompileShader(L"XXXX.hlsl", nullptr, "PixelXXX", "ps_5_1");
+  mInputLayout =
+  {
+      // 对应hlsl里的struct VertexIn中的属性 无论结构体内顺序如何变化都是由以下顺序决定
+      { "XXXX", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+      { "XXXXX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+  };
+  ```
+
+- (绘制前)构建三角形几何
+
+  ```c++
+  ThrowIfFailed(D3DCreateBlob(vbByteSize, &vertexBufferCpu));	// 创建顶点数据内存空间
+  ThrowIfFailed(D3DCreateBlob(ibByteSize, &indexBufferCpu));	// 创建索引数据内存空间
+  
+  CopyMemory(vertexBufferCpu->GetBufferPointer(), vertices.data(), vbByteSize);	// 将顶点数据拷贝至顶点系统内存中
+  CopyMemory(indexBufferCpu->GetBufferPointer(), indices.data(), ibByteSize);	// 将索引数据拷贝至索引系统内存中
+  
+  // 数据从CPU内存拷贝至上传堆，再从上传堆拷贝至默认堆
+  // 默认堆是GPU只读的，非常省资源，所以静态几何体的顶点缓冲区放默认堆来做优化，动态几何体直接放上传堆
+  // CPU的数据不能直接传入默认堆，CPU写入数据必须依靠上传堆
+  vertexBufferGpu = d3dUtil::CreateDefaultBuffer(d3dDevice.Get(), cmdList.Get(), 	vertices.data(), vbByteSize, vertexBufferUploader);
+  indexBufferGpu = d3dUtil::CreateDefaultBuffer(d3dDevice.Get(), cmdList.Get(), indices.data(), ibByteSize, indexBufferUploader);
+  ```
+
+- (绘制前)构建PSO（PipeLineStateObject）
+
+  将之前定义的顶点布局描述、着色器程序字节码、光栅器状态、根签名、图元拓扑方式、采样方式、混合方式、深度模板状态、RTV格式、DSV格式等等对象绑定到图形流水线上
+
+  ```c++
+  D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+  ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
+  
+  psoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };
+  psoDesc.pRootSignature = rootSignature.Get();
+  psoDesc.VS =
+  {
+      reinterpret_cast<BYTE*>(mvsByteCode->GetBufferPointer()),
+      mvsByteCode->GetBufferSize()
+  };
+  psoDesc.PS =
+  {
+      reinterpret_cast<BYTE*>(mpsByteCode->GetBufferPointer()),
+      mpsByteCode->GetBufferSize()
+  };
+  psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+  psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+  psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+  psoDesc.SampleMask = UINT_MAX;	// 0xffffffff,全部采样，没有遮罩
+  psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+  psoDesc.NumRenderTargets = 1;
+  psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;	// 归一化的无符号归一化浮点数
+  psoDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+  psoDesc.SampleDesc.Count = 1;	// 不使用4XMSAA
+  psoDesc.SampleDesc.Quality = 0;	// 不使用4XMSAA
+  
+  ThrowIfFailed(d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PSO)));
+  ```
 
 ### 光照
 

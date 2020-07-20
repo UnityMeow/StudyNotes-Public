@@ -101,7 +101,7 @@ void MeowApp::Draw()
 	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),
 		D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));// 从渲染目标到呈现
 
-	// 完成命令记的关闭命令列表
+	// 完成命令记得关闭命令列表
 	ThrowIfFailed(cmdList->Close());
 
 	// 等CPU将命令都准备好后，需要将待执行的命令列表加入GPU的命令队列
@@ -153,19 +153,19 @@ void MeowApp::CreateConstantBufferView()
 
 void MeowApp::BuildRootSignature()
 {
-	//根参数可以是描述符表、根描述符、根常量
+	// 根参数可以是描述符表、根描述符、根常量
 	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
-	//创建由单个CBV所组成的描述符表
+	// 创建由单个CBV所组成的描述符表
 	CD3DX12_DESCRIPTOR_RANGE cbvTable;
-	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, //描述符类型
-		1, //描述符数量
-		0);//描述符所绑定的寄存器槽号
+	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, // 描述符类型
+		1, // 描述符数量
+		0);// 描述符所绑定的寄存器槽号
 	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
-	//根签名由一组根参数构成
-	CD3DX12_ROOT_SIGNATURE_DESC rootSig(1, //根参数的数量 TODO: currently zero before constant buffer
-		slotRootParameter, //根参数指针
+	// 根签名由一组根参数构成
+	CD3DX12_ROOT_SIGNATURE_DESC rootSig(1, // 根参数的数量 TODO: currently zero before constant buffer
+		slotRootParameter, // 根参数指针
 		0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
-	//用单个寄存器槽来创建一个根签名，该槽位指向一个仅含有单个常量缓冲区的描述符区域
+	// 用单个寄存器槽来创建一个根签名，该槽位指向一个仅含有单个常量缓冲区的描述符区域
 	ComPtr<ID3DBlob> serializedRootSig = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
 	HRESULT hr = D3D12SerializeRootSignature(&rootSig, D3D_ROOT_SIGNATURE_VERSION_1, &serializedRootSig, &errorBlob);

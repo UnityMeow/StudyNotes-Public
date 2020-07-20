@@ -38,8 +38,6 @@ void MeowApp::Draw()
 	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),// 转换资源为后台缓冲区资源
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));// 从呈现到渲染目标转换
 
-	
-
 	// 清除后台缓冲区和深度缓冲区，并赋值
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeap->GetCPUDescriptorHandleForHeapStart(), ref_mCurrentBackBuffer, RTVDesSize);
 	cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::LightPink, 0, nullptr);// 清除RT背景色为XXX色，并且不设置裁剪矩形
@@ -50,14 +48,16 @@ void MeowApp::Draw()
 		0,	// 默认模板值
 		0,	// 裁剪矩形数量
 		nullptr);	// 裁剪矩形指针
-	cmdList->RSSetViewports(1, &viewPort);
-	cmdList->RSSetScissorRects(1, &scissorRect);
+	
 	// 指定将要渲染的缓冲区
 	cmdList->OMSetRenderTargets(1,//待绑定的RTV数量
 		&rtvHandle,	//指向RTV数组的指针
 		true,	//RTV对象在堆内存中是连续存放的
 		&dsvHandle);	//指向DSV的指针
+
 	// 设置视口和裁剪矩形
+	cmdList->RSSetViewports(1, &viewPort);
+	cmdList->RSSetScissorRects(1, &scissorRect);
 
 	// 设置根签名
 	cmdList->SetGraphicsRootSignature(rootSignature.Get());
@@ -83,7 +83,7 @@ void MeowApp::Draw()
 	// 设置根描述符表
 	/*cmdList->SetGraphicsRootDescriptorTable(0, // 根参数的起始索引
 	cbvHeap->GetGPUDescriptorHandleForHeapStart());
-*/
+	*/
 	cmdList->SetPipelineState(PSO.Get());
 	//绘制顶点（通过索引缓冲区绘制）
 	cmdList->DrawIndexedInstanced(sizeof(indices), // 每个实例要绘制的索引数
