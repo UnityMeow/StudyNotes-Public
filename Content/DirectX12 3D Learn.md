@@ -552,6 +552,8 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 [通用着色器核心](https://www.cnblogs.com/X-Jun/p/12246859.html#_label6)
 
+[着色器编译](https://www.cnblogs.com/X-Jun/p/10066282.html)
+
 #### 绘制函数
 
 将各种资源设置到渲染管线上，并最终发出绘制命令
