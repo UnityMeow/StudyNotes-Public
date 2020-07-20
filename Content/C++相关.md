@@ -452,3 +452,11 @@ void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint
 
 ![image-20200713222110994](Assets/C++%E7%9B%B8%E5%85%B3/image-20200713222110994.png)
 
+## VS设置
+
+![image-20200720160942843](Assets/C++相关/image-20200720160942843.png)
+
+- VS一直显示“正在从以下位置***加载符号”的解决办法
+
+  解决方案：进入VS---工具---选项----调试----符号，看右边有个“Microsoft符号服务器”，将前面的勾去掉，（可能还有删除下面的那个缓存）。然后就不会在调试时加载了！
+

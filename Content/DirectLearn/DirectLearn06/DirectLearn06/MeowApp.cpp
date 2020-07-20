@@ -40,6 +40,11 @@ void MeowApp::Draw()
 	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),// 转换资源为后台缓冲区资源
 		D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));// 从呈现到渲染目标转换
 
+	// 设置视口和裁剪矩形
+	cmdList->RSSetViewports(1, &viewPort);
+	cmdList->RSSetScissorRects(1, &scissorRect);
+
+
 	// 清除后台缓冲区和深度缓冲区，并赋值
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeap->GetCPUDescriptorHandleForHeapStart(), ref_mCurrentBackBuffer, RTVDesSize);
 	cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::LightPink, 0, nullptr);// 清除RT背景色为XXX色，并且不设置裁剪矩形
@@ -57,9 +62,7 @@ void MeowApp::Draw()
 		true,	//RTV对象在堆内存中是连续存放的
 		&dsvHandle);	//指向DSV的指针
 
-	// 设置视口和裁剪矩形
-	cmdList->RSSetViewports(1, &viewPort);
-	cmdList->RSSetScissorRects(1, &scissorRect);
+	
 
 	//设置CBV描述符堆
 	ID3D12DescriptorHeap* descriHeaps[] = { cbvHeap.Get() };// 注意这里之所以是数组，是因为还可能包含SRV和UAV，而这里我们只用到了CBV

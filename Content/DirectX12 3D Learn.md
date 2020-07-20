@@ -511,13 +511,6 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
   当创建或重置同意命令列表时，会处于打开的状态，当尝试为同一个命令分配器连续创建两个命令列表时会报错，在没有确定GPU执行完命令分配器中的所有命令之前，千万不要重置命令分配器
 
-- CPU与GPU之间的同步
-
-  
-
-- 资源转换
-
-- 命令与多线程
 
 #### 初始化Direct3D
 
@@ -527,7 +520,7 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 ### 渲染管线 RenderingPipeline
 
-可以想象位一个工厂里的流水线，里面有不同的加工环节（**渲染阶段**）,可以根据用户需求对每个环节灵活改造或拆卸（**可编程流水线，程序员可以在不同的着色器中编写自定义的函数**）。以此把原始材料（**CPU端向GPU段提交的纹理等资源以及指令等**）加工为成品出售给消费者（**在GPU端，资源流经流水线里的各个阶段，经指令的调度对其进行处理，最终计算出像素的颜色，将其呈现在用户屏幕上**）
+可以想象为一个工厂里的流水线，里面有不同的加工环节（**渲染阶段**）,可以根据用户需求对每个环节灵活改造或拆卸（**可编程流水线，程序员可以在不同的着色器中编写自定义的函数**）。以此把原始材料（**CPU端向GPU段提交的纹理等资源以及指令等**）加工为成品出售给消费者（**在GPU端，资源流经流水线里的各个阶段，经指令的调度对其进行处理，最终计算出像素的颜色，将其呈现在用户屏幕上**）
 
 #### 渲染前资源载入
 
@@ -558,6 +551,104 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 #### 着色器
 
 [通用着色器核心](https://www.cnblogs.com/X-Jun/p/12246859.html#_label6)
+
+#### 绘制命令
+
+将各种资源设置到渲染管线上，并最终发出绘制命令
+
+- 重置命令分配器cmdAllocator和命令列表cmdList
+
+  ```c++
+  ThrowIfFailed(cmdAllocator->Reset());// 重复使用记录 命令 的相关内存
+  ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), nullptr/* 临时写为空 */));// 复用命令列表及其内存
+  ```
+
+- 将后台缓冲资源从呈现状态转换到渲染目标状态（即准备接收图像渲染）
+
+  ```c++
+  UINT& ref_mCurrentBackBuffer = mCurrentBackBuffer;
+  cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),// 转换资源为后台缓冲区资源
+  D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));// 从呈现状态转换到渲染目标状态
+  ```
+
+- 设置视口和裁剪矩形
+
+  ```c++
+  // 视口
+  D3D12_VIEWPORT viewPort;
+  // 裁剪矩形
+  D3D12_RECT scissorRect;
+  
+  cmdList->RSSetViewports(1, &viewPort);
+  cmdList->RSSetScissorRects(1, &scissorRect);
+  ```
+
+- 清除后台缓冲区和深度缓冲区，并赋值
+
+  ```c++
+  // 清除后台缓冲区，并赋值
+  D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvHeap->GetCPUDescriptorHandleForHeapStart(), ref_mCurrentBackBuffer, RTVDesSize);
+  // 清除RT背景色为XXX色，并且不设置裁剪矩形
+  cmdList->ClearRenderTargetView(rtvHandle, DirectX::Colors::LightPink, 0, nullptr);
+  // 清除深度缓冲区，并赋值
+  D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+  cmdList->ClearDepthStencilView(dsvHandle,	// DSV描述符句柄
+  		D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,	// FLAG
+  		1.0f,	// 默认深度值
+  		0,	// 默认模板值
+  		0,	// 裁剪矩形数量
+  		nullptr);	// 裁剪矩形指针
+  ```
+
+- 指定将要渲染的缓冲区（指定RTV和DSV）
+
+  ```c++
+  // 指定将要渲染的缓冲区
+  cmdList->OMSetRenderTargets(1,//待绑定的RTV数量
+  	&rtvHandle,	//指向RTV数组的指针
+  	true,	//RTV对象在堆内存中是连续存放的
+  	&dsvHandle);	//指向DSV的指针
+  ```
+
+- 1
+
+- 1
+
+#### 三角形绘制
+
+- 创建顶点数据、索引数据
+
+  ```c++
+  // 顶点数据结构
+  struct Vertex
+  {
+  	XMFLOAT3 Pos;
+  	XMFLOAT4 Color;
+  };
+  // 顶点数据
+  std::array<Vertex, 3> vertices =
+  {
+  	Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
+  	Vertex({ XMFLOAT3(0.0f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
+  	Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
+  };
+  // 索引数据
+  // 索引要按顺时针来排列
+  std::array<std::uint16_t, 3> indices =
+  {
+  	0,1,2
+  };
+  ```
+
+- 获取顶点、索引 数据大小
+
+  ```c++
+  // 获取顶点、索引 数据大小
+  const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+  const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
+  ```
+
+- 
 
 ### 光照
 

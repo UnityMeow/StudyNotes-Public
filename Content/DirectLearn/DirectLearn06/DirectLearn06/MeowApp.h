@@ -30,7 +30,63 @@ class MeowApp : public D3D12App
 	{
 		0,1,2
 	};
+
+	// 立方体
+	// 顶点数据
+	//std::array<Vertex, 8> vertices =
+	//{
+	//	Vertex({ XMFLOAT3(-1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::White) }),
+	//	Vertex({ XMFLOAT3(-1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Black) }),
+	//	Vertex({ XMFLOAT3(+1.0f, +1.0f, -1.0f), XMFLOAT4(Colors::Red) }),
+	//	Vertex({ XMFLOAT3(+1.0f, -1.0f, -1.0f), XMFLOAT4(Colors::Green) }),
+	//	Vertex({ XMFLOAT3(-1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Blue) }),
+	//	Vertex({ XMFLOAT3(-1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Yellow) }),
+	//	Vertex({ XMFLOAT3(+1.0f, +1.0f, +1.0f), XMFLOAT4(Colors::Cyan) }),
+	//	Vertex({ XMFLOAT3(+1.0f, -1.0f, +1.0f), XMFLOAT4(Colors::Magenta) })
+	//};
+	//// 索引数据
+	//std::array<std::uint16_t, 36> indices =
+	//{
+	//	//前
+	//	0, 1, 2,
+	//	0, 2, 3,
+
+	//	//后
+	//	4, 6, 5,
+	//	4, 7, 6,
+
+	//	//左
+	//	4, 5, 1,
+	//	4, 1, 0,
+
+	//	//右
+	//	3, 2, 6,
+	//	3, 6, 7,
+
+	//	//上
+	//	1, 5, 6,
+	//	1, 6, 2,
+
+	//	//下
+	//	4, 0, 3,
+	//	4, 3, 7
+	//};
+
+	//// 顶点数据  (矩形)
+	//std::array<Vertex, 4> vertices =
+	//{
+	//	Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
+	//	Vertex({ XMFLOAT3(-0.5f, 0.5f,0),XMFLOAT4(Colors::Red) }),
+	//	Vertex({ XMFLOAT3(0.5f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
+	//	Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
+	//};
+	//// 索引数据
+	//std::array<std::uint16_t, 6> indices =
+	//{
+	//	0,1,2,0,2,3
+	//};
 	
+	// 获取顶点、索引 数据大小
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
 
