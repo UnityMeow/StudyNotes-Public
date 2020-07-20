@@ -25,5 +25,5 @@ VertexOut VertMeow(VertexIn vin)
 
 float4 PixelHusky(VertexOut pin) : SV_Target0
 {
-	return testColor;
+	return pin.Color;
 }

@@ -8,7 +8,7 @@ using namespace DirectX::PackedVector;
 struct Vertex
 {
 	XMFLOAT3 Pos;
-	XMCOLOR Color;
+	XMFLOAT4 Color;
 };
 
 struct ObjectConstants
@@ -21,9 +21,9 @@ class MeowApp : public D3D12App
 	// 顶点数据
 	std::array<Vertex, 3> vertices =
 	{
-		Vertex({ XMFLOAT3(-1,-1,0.5), XMCOLOR(Colors::Red) }),
-		Vertex({ XMFLOAT3(0,1,0.5), XMCOLOR(Colors::Green) }),
-		Vertex({ XMFLOAT3(1,-1,0.5), XMCOLOR(Colors::Blue) }),
+		Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
+		Vertex({ XMFLOAT3(0.0f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
+		Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
 	};
 	// 索引数据
 	std::array<std::uint16_t, 3> indices =
