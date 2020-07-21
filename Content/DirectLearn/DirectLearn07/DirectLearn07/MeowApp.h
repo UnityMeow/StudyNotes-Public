@@ -18,19 +18,6 @@ struct ObjectConstants
 
 class MeowApp : public D3D12App
 {
-	//// 顶点数据
-	//std::array<Vertex, 3> vertices =
-	//{
-	//	Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
-	//	Vertex({ XMFLOAT3(0.0f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
-	//	Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
-	//};
-	//// 索引数据
-	//std::array<std::uint16_t, 3> indices =
-	//{
-	//	0,1,2
-	//};
-#pragma region 其它顶点索引数据
 	 // 立方体
 	 // 顶点数据
 	std::array<Vertex, 8> vertices =
@@ -72,20 +59,6 @@ class MeowApp : public D3D12App
 		4, 3, 7
 	};
 
-	//// 顶点数据  (矩形)
-	//std::array<Vertex, 4> vertices =
-	//{
-	//	Vertex({ XMFLOAT3(-0.5f, -0.5f,0),XMFLOAT4(Colors::Red) }),
-	//	Vertex({ XMFLOAT3(-0.5f, 0.5f,0),XMFLOAT4(Colors::Red) }),
-	//	Vertex({ XMFLOAT3(0.5f, 0.5f, 0),XMFLOAT4(Colors::Green) }),
-	//	Vertex({ XMFLOAT3(0.5f, -0.5f, 0),XMFLOAT4(Colors::Blue) }),
-	//};
-	//// 索引数据
-	//std::array<std::uint16_t, 6> indices =
-	//{
-	//	0,1,2,0,2,3
-	//};
-#pragma endregion
 	// 获取顶点、索引 数据大小
 	const UINT vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
 	const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
@@ -113,8 +86,10 @@ class MeowApp : public D3D12App
 
 	XMFLOAT4X4 world = MathHelper::Identity4x4();
 
+	POINT lastMousePos;
+
 public:
-	MeowApp();
+	MeowApp(HINSTANCE hInstance);
 	~MeowApp();
 	bool Init(HINSTANCE hInstance, int nShowCmd) override;
 private:
@@ -132,4 +107,8 @@ private:
 	void BuildTriangle();
 	// 构建PSO
 	void BuildPSO();
+
+	void OnMouseDown(WPARAM btnState, int x, int y);
+	void OnMouseUp(WPARAM btnState, int x, int y);
+	void OnMouseMove(WPARAM btnState, int x, int y);
 };

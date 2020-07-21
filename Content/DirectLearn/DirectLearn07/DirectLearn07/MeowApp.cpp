@@ -1,6 +1,8 @@
 ﻿#include "MeowApp.h"
 
-MeowApp::MeowApp()
+MeowApp::MeowApp(HINSTANCE hInstance)
+	:
+	D3D12App(hInstance)
 {
 }
 
@@ -277,3 +279,32 @@ void MeowApp::BuildPSO()
 
 	ThrowIfFailed(d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PSO)));
 }
+
+void MeowApp::OnMouseDown(WPARAM btnState, int x, int y)
+{
+	// 按下是鼠标坐标
+	lastMousePos.x = x;
+	lastMousePos.y = y;
+	SetCapture(mhMainWnd);
+}
+
+void MeowApp::OnMouseUp(WPARAM btnState, int x, int y)
+{
+	ReleaseCapture();
+}
+
+void MeowApp::OnMouseMove(WPARAM btnState, int x, int y)
+{
+	if ((btnState & MK_LBUTTON) != 0) // 左键
+	{
+		// TODO: 坐标计算
+	}
+	else if ((btnState & MK_RBUTTON) != 0) // 右键
+	{
+		// TODO: 坐标计算
+	}
+	lastMousePos.x = x;
+	lastMousePos.y = y;
+}
+
+

@@ -7,7 +7,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 #endif
 	try
 	{
-		MeowApp theApp;
+		MeowApp theApp(hInstance);
 		if (!theApp.Init(hInstance, nShowCmd))
 			return 0;
 

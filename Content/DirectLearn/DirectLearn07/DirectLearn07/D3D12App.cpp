@@ -1,33 +1,31 @@
 ﻿#include "D3D12App.h"
 
+D3D12App* D3D12App::mApp = nullptr;
+
 // 窗口过程函数的声明,HWND是主窗口句柄
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lparam);
-
 
 // 窗口过程函数
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	//消息处理
-	switch (msg)
-	{
-		//当窗口被销毁时，终止消息循环
-	case WM_DESTROY:
-		PostQuitMessage(0);	//终止消息循环，并发出WM_QUIT消息
-		return 0;
-	default:
-		break;
-	}
-	//将上面没有处理的消息转发给默认的窗口过程
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	return D3D12App::GetApp()->MsgProc(hwnd, msg, wParam, lParam);
 }
 
-
-D3D12App::D3D12App()
+D3D12App::D3D12App(HINSTANCE hInstance)
+	:
+	mInstance(hInstance)
 {
+	assert(mApp == nullptr);
+	mApp = this;
 }
 
 D3D12App::~D3D12App()
 {
+}
+
+D3D12App* D3D12App::GetApp()
+{
+	return mApp;
 }
 
 int D3D12App::Run()
@@ -362,6 +360,35 @@ void  D3D12App::CalculateFrameState()
 		frameCnt = 0;
 		timeElapsed += 1.0f;
 	}
+}
+
+LRESULT D3D12App::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	// 消息处理
+	switch (msg)
+	{
+		// 鼠标按下
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		break;
+		// 鼠标抬起
+	case WM_LBUTTONUP:
+	case WM_MBUTTONUP:
+	case WM_RBUTTONUP:
+		break;
+		// 鼠标移动
+	case WM_MOUSEMOVE:
+		break;
+		// 当窗口被销毁时，终止消息循环
+	case WM_DESTROY:
+		PostQuitMessage(0);	// 终止消息循环，并发出WM_QUIT消息
+		return 0;
+	default:
+		break;
+	}
+	// 将上面没有处理的消息转发给默认的窗口过程
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 

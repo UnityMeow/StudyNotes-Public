@@ -12,11 +12,12 @@ using namespace Microsoft::WRL;
 class D3D12App
 {
 protected:
-    D3D12App();
+    D3D12App(HINSTANCE hInstance);
     virtual ~D3D12App();
     D3D12App(const D3D12App& rhs) = delete;
     D3D12App& operator=(const D3D12App& rhs) = delete;
 public:
+	static D3D12App* GetApp();
 	int Run();
 	virtual bool Init(HINSTANCE hInstance, int nShowCmd);
 	virtual void Draw();
@@ -36,8 +37,10 @@ public:
 
 	void FlushCmdQueue();
 	void CalculateFrameState();
-
+	LRESULT CALLBACK MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 protected:
+	static D3D12App* mApp;
+	HINSTANCE mInstance;
 	HWND mhMainWnd = 0;
 	// 设备
 	ComPtr<ID3D12Device> d3dDevice;
