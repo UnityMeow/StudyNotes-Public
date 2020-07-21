@@ -304,6 +304,34 @@ void File::AutoCreatFolder(const vengine::string& path)
 
 ## 智障喵注意事项
 
+- 如果要在类中写静态变量要去cpp中初始化
+
+  `static D3D12App* mApp;`
+
+  `D3D12App* D3D12App::mApp = nullptr;`
+
+- 子类初始化父类构造
+
+  ```c++
+  class MeowApp : public D3D12App
+      
+  D3D12App::D3D12App(HINSTANCE hInstance)
+  	:
+  	mInstance(hInstance)
+  {
+  	assert(mApp == nullptr);
+  	mApp = this;
+  }
+  
+  MeowApp::MeowApp(HINSTANCE hInstance)
+  	:
+  	D3D12App(hInstance)
+  {
+  }
+  ```
+
+----
+
 - operator也可以重载括号
 
 ------
