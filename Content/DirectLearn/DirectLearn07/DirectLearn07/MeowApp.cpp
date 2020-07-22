@@ -120,10 +120,17 @@ void MeowApp::Draw()
 	FlushCmdQueue();
 }
 
+void MeowApp::OnResize()
+{
+	D3D12App::OnResize();
+
+	// 构建投影矩阵
+	XMMATRIX p = XMMatrixPerspectiveFovLH(0.25f * 3.1415926f, (float)(clientWidth / clientHeight), 1.0f, 1000.0f);
+	XMStoreFloat4x4(&proj, p);
+}
+
 void MeowApp::Update()
 {
-	ObjectConstants objConstants;
-
 	// 让摄像机在以（0，0）为圆心，r为半径的圆上做运动。
 	// 知道圆的标准方程为(x-a)²+(y-b)²=r²，圆心坐标为(a，b)，圆半径为r，此案例的圆心坐标点为（0，0），所以方程简化为x²+y²=r²
 	//float x = 5.0f;
@@ -134,24 +141,31 @@ void MeowApp::Update()
 	//x *= sinf(gt.TotalTime());
 	//z = sqrt(r * r - x * x);
 
-	// 构建摄像机观察矩阵
-	float x = 5.0f;
-	float y = 5.0f;
-	float z = 5.0f;
+	//// 构建摄像机观察矩阵
+	//float x = 5.0f;
+	//float y = 5.0f;
+	//float z = 5.0f;
+
+	float y = radius * cosf(phi);
+	float x = radius * sinf(phi) * cosf(theta);
+	float z = radius * sinf(phi) * sinf(theta);
 
 	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
 	XMVECTOR target = XMVectorZero();
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	// 相机的世界坐标
 	XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
+	XMStoreFloat4x4(&view, v);
 
 	// 构建投影矩阵
 	// 摄像机的屏幕坐标
-	XMMATRIX p = XMMatrixPerspectiveFovLH(0.3f * 3.1416f, 1280.0f / 720.0f, 1.0f, 1000.0f);
+	XMMATRIX p = XMLoadFloat4x4(&proj);
 	// 构建世界矩阵
-	XMLoadFloat4x4(&world);
+	XMMATRIX w = XMLoadFloat4x4(&world);
 	// 矩阵计算
-	XMMATRIX WVP_Matrix = v * p;
+	XMMATRIX WVP_Matrix = w * v * p;
+
+	ObjectConstants objConstants;
 	// XMMATRIX赋值给XMFLOAT4X4
 	XMStoreFloat4x4(&objConstants.worldViewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
 	// 将数据拷贝至GPU缓存
@@ -297,11 +311,24 @@ void MeowApp::OnMouseMove(WPARAM btnState, int x, int y)
 {
 	if ((btnState & MK_LBUTTON) != 0) // 左键
 	{
-		// TODO: 坐标计算
+		// 将鼠标的移动距离换算成弧度，0.25为调节阈值
+		float dx = XMConvertToRadians((float)(lastMousePos.x - x) * 0.25f);
+		float dy = XMConvertToRadians((float)(lastMousePos.y - y) * 0.25f);
+		// 计算鼠标没有松开前的累计弧度
+		theta += dx;
+		phi += dy;
+		// 限制角度phi的范围在（0.1， Pi-0.1）
+		phi = MathHelper::Clamp(phi, 0.2f, 3.1416f - 0.1f);
 	}
 	else if ((btnState & MK_RBUTTON) != 0) // 右键
 	{
-		// TODO: 坐标计算
+		// 将鼠标的移动距离换算成缩放大小，0.005为调节阈值
+		float dx = 0.005f * (float)(x - lastMousePos.x);
+		float dy = 0.005f * (float)(y - lastMousePos.y);
+		// 根据鼠标输入更新摄像机可视范围半径
+		radius += dx - dy;
+		// 限制可视范围半径
+		radius = MathHelper::Clamp(radius, 3.0f, 15.0f);
 	}
 	lastMousePos.x = x;
 	lastMousePos.y = y;

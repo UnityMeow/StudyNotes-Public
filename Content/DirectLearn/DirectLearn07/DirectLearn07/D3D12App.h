@@ -21,6 +21,10 @@ public:
 	int Run();
 	virtual bool Init(HINSTANCE hInstance, int nShowCmd);
 	virtual void Draw();
+	virtual void OnResize();
+	virtual void OnMouseDown(WPARAM btnState, int x, int y);
+	virtual void OnMouseUp(WPARAM btnState, int x, int y);
+	virtual void OnMouseMove(WPARAM btnState, int x, int y);
 	bool InitWindow(HINSTANCE hInstance, int nShowCmd);
 	bool InitDirect3D();
 
@@ -42,6 +46,11 @@ protected:
 	static D3D12App* mApp;
 	HINSTANCE mInstance;
 	HWND mhMainWnd = 0;
+	bool isAppPaused = false;
+	bool isMinimized = false;
+	bool isMaximized = false;
+	bool isResizing = false;
+
 	// 设备
 	ComPtr<ID3D12Device> d3dDevice;
 	ComPtr<IDXGIFactory4> DXGIFac;
@@ -80,4 +89,7 @@ protected:
 
 	//GameTime类实例声明
 	GameTimer gt;
+
+	float clientWidth = 500;
+	float clientHeight = 500;
 };

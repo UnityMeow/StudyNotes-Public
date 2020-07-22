@@ -85,8 +85,14 @@ class MeowApp : public D3D12App
 	ComPtr<ID3DBlob> mpsByteCode = nullptr;
 
 	XMFLOAT4X4 world = MathHelper::Identity4x4();
+	XMFLOAT4X4 view = MathHelper::Identity4x4();
+	XMFLOAT4X4 proj = MathHelper::Identity4x4();
 
 	POINT lastMousePos;
+
+	float theta = 1.5f * XM_PI;
+	float phi = XM_PIDIV4;
+	float radius = 10.0f;
 
 public:
 	MeowApp(HINSTANCE hInstance);
@@ -94,6 +100,7 @@ public:
 	bool Init(HINSTANCE hInstance, int nShowCmd) override;
 private:
 	virtual void Draw()override;
+	virtual void OnResize()override;
 	void Update();
 	// 创建描述符堆
 	void CreateDescriptorHeap();
@@ -108,7 +115,7 @@ private:
 	// 构建PSO
 	void BuildPSO();
 
-	void OnMouseDown(WPARAM btnState, int x, int y);
-	void OnMouseUp(WPARAM btnState, int x, int y);
-	void OnMouseMove(WPARAM btnState, int x, int y);
+	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
+	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
+	virtual void OnMouseMove(WPARAM btnState, int x, int y) override;
 };

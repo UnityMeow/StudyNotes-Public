@@ -1,4 +1,5 @@
 ﻿#include "D3D12App.h"
+#include <windowsx.h>
 
 D3D12App* D3D12App::mApp = nullptr;
 
@@ -70,6 +71,7 @@ bool D3D12App::Init(HINSTANCE hInstance, int nShowCmd)
 	}
 	else
 	{
+		OnResize();
 		return true;
 	}
 }
@@ -100,8 +102,8 @@ bool D3D12App::InitWindow(HINSTANCE hInstance, int nShowCmd)
 	RECT R;	//裁剪矩形
 	R.left = 0;
 	R.top = 0;
-	R.right = 1280;
-	R.bottom = 720;
+	R.right = clientWidth;
+	R.bottom = clientHeight;
 	AdjustWindowRect(&R, WS_OVERLAPPEDWINDOW, false);	//根据窗口的客户区大小计算窗口的大小
 	int width = R.right - R.left;
 	int hight = R.bottom - R.top;
@@ -129,9 +131,9 @@ bool D3D12App::InitDirect3D()
 	CreateCommandObject();
 	CreateSwapChain();
 	CreateDescriptorHeap();
-	CreateRTV();
+	/*CreateRTV();
 	CreateDSV();
-	CreateViewPortAndScissorRect();
+	CreateViewPortAndScissorRect();*/
 
 	return true;
 }
@@ -139,6 +141,50 @@ bool D3D12App::InitDirect3D()
 void D3D12App::Draw()
 {
 	
+}
+
+void D3D12App::OnResize()
+{
+	assert(d3dDevice);
+	assert(swapChain);
+	assert(cmdAllocator);
+	FlushCmdQueue();// 改变资源前先同步
+
+	ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), nullptr));
+	
+	// 释放之前的资源，为我们重新创建做好准备
+	for (int i = 0; i < 2; i++)
+	{
+		swapChainBuffer[i].Reset();
+	}
+	depthStencilBuffer.Reset();
+
+	// 重新调整后台缓冲区资源的大小
+	ThrowIfFailed(swapChain->ResizeBuffers(2,
+		clientWidth,
+		clientHeight,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH));
+
+	// 后台缓冲区索引置零
+	mCurrentBackBuffer = 0;
+
+	CreateRTV();
+	CreateDSV();
+	CreateViewPortAndScissorRect();
+
+}
+
+void D3D12App::OnMouseDown(WPARAM btnState, int x, int y)
+{
+}
+
+void D3D12App::OnMouseUp(WPARAM btnState, int x, int y)
+{
+}
+
+void D3D12App::OnMouseMove(WPARAM btnState, int x, int y)
+{
 }
 
 void D3D12App::CreateDevice()
@@ -206,8 +252,8 @@ void D3D12App::CreateSwapChain()
 
 	// 初始化交换链描述符
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	swapChainDesc.BufferDesc.Width = 1280;	// 缓冲区分辨率的宽度
-	swapChainDesc.BufferDesc.Height = 720;	// 缓冲区分辨率的高度
+	swapChainDesc.BufferDesc.Width = clientWidth;	// 缓冲区分辨率的宽度
+	swapChainDesc.BufferDesc.Height = clientHeight;	// 缓冲区分辨率的高度
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// 缓冲区的显示格式
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;	// 刷新率的分子
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;	// 刷新率的分母
@@ -268,7 +314,6 @@ void D3D12App::CreateRTV()
 		// 偏移到描述符堆中的下一个缓冲区
 		rtvHeapHandle.Offset(1, RTVDesSize);
 	}
-	//DirectX::PackedVector::XMCOLOR
 }
 
 void D3D12App::CreateDSV()
@@ -279,8 +324,8 @@ void D3D12App::CreateDSV()
 	dsvResourceDesc.Alignment = 0;	// 指定对齐
 	dsvResourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;	// 指定资源维度（类型）为TEXTURE2D
 	dsvResourceDesc.DepthOrArraySize = 1;	// 纹理深度为1
-	dsvResourceDesc.Width = 1280;	// 资源宽
-	dsvResourceDesc.Height = 720;	// 资源高
+	dsvResourceDesc.Width = clientWidth;	// 资源宽
+	dsvResourceDesc.Height = clientHeight;	// 资源高
 	dsvResourceDesc.MipLevels = 1;	// MIPMAP层级数量
 	dsvResourceDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;	// 指定纹理布局（这里不指定）
 	dsvResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;	// 深度模板资源的Flag
@@ -304,6 +349,17 @@ void D3D12App::CreateDSV()
 	d3dDevice->CreateDepthStencilView(depthStencilBuffer.Get(),
 		nullptr,	// D3D12_DEPTH_STENCIL_VIEW_DESC类型指针，可填&dsvDesc（见上注释代码),由于在创建深度模板资源时已经定义深度模板数据属性，所以这里可以指定为空指针
 		dsvHeap->GetCPUDescriptorHandleForHeapStart());	// DSV句柄
+
+	cmdList->ResourceBarrier(1,	//Barrier屏障个数
+		&CD3DX12_RESOURCE_BARRIER::Transition(depthStencilBuffer.Get(),
+			D3D12_RESOURCE_STATE_COMMON,	//转换前状态（创建时的状态，即CreateCommittedResource函数中定义的状态）
+			D3D12_RESOURCE_STATE_DEPTH_WRITE));	//转换后状态为可写入的深度图，还有一个D3D12_RESOURCE_STATE_DEPTH_READ是只可读的深度图
+
+	ThrowIfFailed(cmdList->Close());
+	ID3D12CommandList* cmdLists[] = { cmdList.Get() };
+	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
+
+	FlushCmdQueue();
 }
 
 void D3D12App::CreateViewPortAndScissorRect()
@@ -311,16 +367,16 @@ void D3D12App::CreateViewPortAndScissorRect()
 	// 视口设置
 	viewPort.TopLeftX = 0;
 	viewPort.TopLeftY = 0;
-	viewPort.Width = 1280;
-	viewPort.Height = 720;
+	viewPort.Width = clientWidth;
+	viewPort.Height = clientHeight;
 	viewPort.MaxDepth = 1.0f;
 	viewPort.MinDepth = 0.0f;
 	// 裁剪矩形设置（矩形外的像素都将被剔除）
 	// 前两个为左上点坐标，后两个为右下点坐标
 	scissorRect.left = 0;
 	scissorRect.top = 0;
-	scissorRect.right = 1280;
-	scissorRect.bottom = 720;
+	scissorRect.right = clientWidth;
+	scissorRect.bottom = clientHeight;
 }
 
 void D3D12App::FlushCmdQueue()
@@ -367,25 +423,71 @@ LRESULT D3D12App::MsgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	// 消息处理
 	switch (msg)
 	{
+	case WM_SIZE:
+		clientWidth = LOWORD(lParam);
+		clientHeight = HIWORD(lParam);
+		if (d3dDevice)
+		{
+			//如果最小化,则暂停游戏，调整最小化和最大化状态
+			if (wParam == SIZE_MINIMIZED)
+			{
+				isAppPaused = true;
+				isMinimized = true;
+				isMaximized = false;
+			}
+			else if (wParam == SIZE_MAXIMIZED)
+			{
+				isAppPaused = false;
+				isMinimized = false;
+				isMaximized = true;
+				OnResize();
+			}
+			else if (wParam == SIZE_RESTORED)
+			{
+				if (isMinimized)
+				{
+					isAppPaused = false;
+					isMinimized = false;
+					OnResize();
+				}
+				else if (isMaximized)
+				{
+					isAppPaused = false;
+					isMaximized = false;
+					OnResize();
+				}
+				else if (!isResizing)
+				{
+					OnResize();
+				}
+			}
+		}
+		return 0;
 		// 鼠标按下
 	case WM_LBUTTONDOWN:
 	case WM_MBUTTONDOWN:
 	case WM_RBUTTONDOWN:
-		break;
+		OnMouseDown(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
 		// 鼠标抬起
 	case WM_LBUTTONUP:
 	case WM_MBUTTONUP:
 	case WM_RBUTTONUP:
-		break;
+		OnMouseUp(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
 		// 鼠标移动
 	case WM_MOUSEMOVE:
-		break;
+		OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		return 0;
 		// 当窗口被销毁时，终止消息循环
 	case WM_DESTROY:
 		PostQuitMessage(0);	// 终止消息循环，并发出WM_QUIT消息
 		return 0;
-	default:
-		break;
+		//设置窗口的最小尺寸
+	case WM_GETMINMAXINFO:
+		((MINMAXINFO*)lParam)->ptMinTrackSize.x = 200;
+		((MINMAXINFO*)lParam)->ptMinTrackSize.y = 200;
+		return 0;
 	}
 	// 将上面没有处理的消息转发给默认的窗口过程
 	return DefWindowProc(hwnd, msg, wParam, lParam);
