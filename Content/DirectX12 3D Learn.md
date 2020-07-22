@@ -343,6 +343,8 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 - 可以直接用封装好的库
 
+### 三角函数
+
 ##  Direct3D 基础
 
 ### Direct3D的初始化
@@ -556,6 +558,31 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 [着色器编译](https://www.cnblogs.com/X-Jun/p/10066282.html)
 
+#### 光栅器状态
+
+```c++
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	// 光栅器状态修改 
+	/*	FillMode
+		D3D12_FILL_MODE_WIREFRAME以线框模式渲染立方体 
+		D3D12_FILL_MODE_SOLID以实体模式渲染立方体 
+	*/
+	// psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	/*	CullMode
+		D3D12_CULL_MODE_FRONT剔除正面朝向的三角形
+		D3D12_CULL_MODE_BACK剔除背面朝向的三角形
+	*/
+	// psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+```
+
+#### PSO（PipeLineStateObject）
+
+流水线状态对象
+
+将之前定义的顶点布局描述、着色器程序字节码、光栅器状态、根签名、图元拓扑方式、采样方式、混合方式、深度模板状态、RTV格式、DSV格式等等对象绑定到图形流水线上
+
+由于PSO的验证和创建过于耗时，在初始化期间就生成PSO，除非有特别的需求，考虑到性能问题，要尽可能减少改变PSO状态的次数，千万不要在每次绘制调用时都修改PSO
+
 #### 绘制函数
 
 将各种资源设置到渲染管线上，并最终发出绘制命令
@@ -749,10 +776,8 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 - (绘制前)构建PSO（PipeLineStateObject）
 
-  将之前定义的顶点布局描述、着色器程序字节码、光栅器状态、根签名、图元拓扑方式、采样方式、混合方式、深度模板状态、RTV格式、DSV格式等等对象绑定到图形流水线上
-
   ```c++
-  D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
   ZeroMemory(&psoDesc, sizeof(D3D12_GRAPHICS_PIPELINE_STATE_DESC));
   
   psoDesc.InputLayout = { mInputLayout.data(), (UINT)mInputLayout.size() };

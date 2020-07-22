@@ -281,6 +281,17 @@ void MeowApp::BuildPSO()
 		mpsByteCode->GetBufferSize()
 	};
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	// 光栅器状态修改 
+	/*	FillMode
+		D3D12_FILL_MODE_WIREFRAME以线框模式渲染立方体 
+		D3D12_FILL_MODE_SOLID以实体模式渲染立方体 
+	*/
+	// psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	/*	CullMode
+		D3D12_CULL_MODE_FRONT剔除正面朝向的三角形
+		D3D12_CULL_MODE_BACK剔除背面朝向的三角形
+	*/
+	// psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.SampleMask = UINT_MAX;	//0xffffffff,全部采样，没有遮罩
