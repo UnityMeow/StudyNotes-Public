@@ -710,6 +710,18 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
   const UINT ibByteSize = (UINT)indices.size() * sizeof(uint16_t);
   ```
 
+- (绘制前)创建描述符堆  *三角形绘制可不加
+
+  ```c++
+  	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
+  	cbvHeapDesc.NumDescriptors = 2; // 描述符数量
+  	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+  	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+  	cbvHeapDesc.NodeMask = 0;
+  	ThrowIfFailed(d3dDevice->CreateDescriptorHeap(&cbvHeapDesc,
+  		IID_PPV_ARGS(&cbvHeap)));
+  ```
+  
 - (绘制前)构建根签名
 
   ```c++
