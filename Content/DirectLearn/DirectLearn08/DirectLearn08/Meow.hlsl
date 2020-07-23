@@ -1,6 +1,11 @@
 cbuffer cbPerObject : register(b0)
 {
-	float4x4 worldViewProj;
+	float4x4 world;
+};
+
+cbuffer cbPass : register(b1)
+{
+	float4x4 viewProj;
 };
 
 struct VertexIn
@@ -16,10 +21,10 @@ struct VertexOut
 };
 
 VertexOut VertMeow(VertexIn vin)
-{
+{	
 	VertexOut o;
-	o.PosH = mul(float4(vin.PosL, 1.0f), worldViewProj);
-	//o.PosH = float4(vin.PosL, 1);
+	float3 PosW = mul(float4(vin.PosL, 1.0f), world).xyz;
+	o.PosH = mul(float4(PosW, 1.0f), viewProj);
 	o.Color = vin.Color;
 	return o;
 }

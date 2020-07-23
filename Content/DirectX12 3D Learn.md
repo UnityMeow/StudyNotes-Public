@@ -542,11 +542,13 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 - RootDescriptorTable 根描述符表
 - RootConstant 根常量
-- RootDescriptor 根描述符  如果数据是一维数据类型，如Buffer，常常不需要通过Descriptor Heap，可以直接传递到Root Signature
+- RootDescriptor 根描述符  如果数据是一维数据类型，如Buffer，常常不需要通过DescriptorHeap，可以直接传递到RootSignature
 
 根签名必须要有，但如果没有用到常量数据，CBV为空则不需要设置根描述符表
 
 根签名的大小会影响渲染提交效率，尽可能的细分
+
+根签名  RootSignature -> 根描述符表 RootDescriptorTable -> 根描述符堆DescriptorHeap -> 根描述符Descriptor
 
 #### CBV常量缓冲区描述符 - ConstantBufferView
 

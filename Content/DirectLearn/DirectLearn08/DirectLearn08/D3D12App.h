@@ -90,6 +90,6 @@ protected:
 	//GameTime类实例声明
 	GameTimer gt;
 
-	float clientWidth = 500;
-	float clientHeight = 500;
+	float clientWidth = 1280;
+	float clientHeight = 720;
 };

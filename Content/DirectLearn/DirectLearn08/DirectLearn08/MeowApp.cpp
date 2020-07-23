@@ -91,7 +91,19 @@ void MeowApp::Draw()
 	// 将图元拓扑类型传入渲染管线
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 设置根描述符表
-	cmdList->SetGraphicsRootDescriptorTable(0, /* 根参数的起始索引 */cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	//cmdList->SetGraphicsRootDescriptorTable(0, /* 根参数的起始索引 */cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	//设置根描述符表
+	int objCbvIndex = 0;
+	auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	handle.Offset(objCbvIndex, CbvSrvUavDesSize);
+	cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
+		handle);
+
+	int passCbvIndex = 1;
+	handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	handle.Offset(passCbvIndex, CbvSrvUavDesSize);
+	cmdList->SetGraphicsRootDescriptorTable(1, //根参数的起始索引
+		handle);
 
 	//绘制顶点（通过索引缓冲区绘制）
 	cmdList->DrawIndexedInstanced(sizeof(indices), // 每个实例要绘制的索引数
@@ -131,23 +143,11 @@ void MeowApp::OnResize()
 
 void MeowApp::Update()
 {
-	// 让摄像机在以（0，0）为圆心，r为半径的圆上做运动。
-	// 知道圆的标准方程为(x-a)²+(y-b)²=r²，圆心坐标为(a，b)，圆半径为r，此案例的圆心坐标点为（0，0），所以方程简化为x²+y²=r²
-	//float x = 5.0f;
-	//float y = 5.0f;
-	//float z = 5.0f;
-	//float r = 10.0f;
-	//// 摄像机的y轴不变，通过时间函数和圆方程计算出x和z的函数关系
-	//x *= sinf(gt.TotalTime());
-	//z = sqrt(r * r - x * x);
-
-	//// 构建摄像机观察矩阵
-	//float x = 5.0f;
-	//float y = 5.0f;
-	//float z = 5.0f;
-
-	float y = radius * cosf(phi);
+	ObjectConstants objConstants;
+	PassConstants passConstants;
+	
 	float x = radius * sinf(phi) * cosf(theta);
+	float y = radius * cosf(phi);
 	float z = radius * sinf(phi) * sinf(theta);
 
 	XMVECTOR pos = XMVectorSet(x, y, z, 1.0f);
@@ -155,27 +155,33 @@ void MeowApp::Update()
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	// 相机的世界坐标
 	XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
-	XMStoreFloat4x4(&view, v);
+	//XMStoreFloat4x4(&view, v);
+
+	// 构建世界矩阵
+	XMMATRIX w = XMLoadFloat4x4(&world);
+	w *= XMMatrixTranslation(2.0f, 1.0f, 0.0f);
 
 	// 构建投影矩阵
 	// 摄像机的屏幕坐标
 	XMMATRIX p = XMLoadFloat4x4(&proj);
-	// 构建世界矩阵
-	XMMATRIX w = XMLoadFloat4x4(&world);
 	// 矩阵计算
-	XMMATRIX WVP_Matrix = w * v * p;
+	XMMATRIX WVP_Matrix = v * p;
 
-	ObjectConstants objConstants;
 	// XMMATRIX赋值给XMFLOAT4X4
-	XMStoreFloat4x4(&objConstants.worldViewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
+	XMStoreFloat4x4(&passConstants.viewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
+	passCB->CopyData(0, passConstants);
+
+	// XMMATRIX赋值给XMFLOAT4X4
+	XMStoreFloat4x4(&objConstants.world, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(w));
 	// 将数据拷贝至GPU缓存
 	objCB->CopyData(0, objConstants);
+	
 }
 
 void MeowApp::CreateDescriptorHeap()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 1;
+	cbvHeapDesc.NumDescriptors = 2;
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
@@ -188,38 +194,75 @@ void MeowApp::CreateConstantBufferView()
 	objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), 1, true);
 
 	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-
+	// 获得常量缓冲区首地址
 	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objCB->Resource()->GetGPUVirtualAddress();
-	// Offset to the ith object constant buffer in the buffer.
-	int boxCBufIndex = 0;
-	cbAddress += (int64_t)boxCBufIndex * objCBByteSize;
-
+	// 常量缓冲区子物体个数（子缓冲区个数）下标
+	int objCbElementIndex = 0;
+	cbAddress += (int64_t)objCbElementIndex * objCBByteSize;
+	// CBV堆中的CBV元素索引
+	int heapIndex = 0;
+	// 获得CBV堆首地址
+	auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
+	// CBV句柄（CBV堆中的CBV元素地址）
+	handle.Offset(heapIndex, CbvSrvUavDesSize);	
+	// 创建CBV描述符
 	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
 	cbvDesc.BufferLocation = cbAddress;
 	cbvDesc.SizeInBytes = objCBByteSize;
-
 	d3dDevice->CreateConstantBufferView(
 		&cbvDesc,
-		cbvHeap->GetCPUDescriptorHandleForHeapStart());
-	ObjectConstants obj;
-	//obj.testColor = XMFLOAT4(1, 1, 1, 1);
-	objCB->CopyData(0, obj);
+		handle);
+
+
+	passCB = std::make_unique<UploadBuffer<PassConstants>>(d3dDevice.Get(), 1, true);
+
+	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
+	// 获得常量缓冲区首地址
+	D3D12_GPU_VIRTUAL_ADDRESS cbAddressP = passCB->Resource()->GetGPUVirtualAddress();
+	// 常量缓冲区子物体个数（子缓冲区个数）下标
+	int passCbElementIndex = 0;
+	cbAddressP += (int64_t)passCbElementIndex * passCBByteSize;
+	// CBV堆中的CBV元素索引
+	int heapIndex1 = 1;
+	// 获得CBV堆首地址
+	auto handle1 = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
+	// CBV句柄（CBV堆中的CBV元素地址）
+	handle1.Offset(heapIndex1, CbvSrvUavDesSize);
+	// 创建CBV描述符
+	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc1;
+	cbvDesc1.BufferLocation = cbAddressP;
+	cbvDesc1.SizeInBytes = passCBByteSize;
+	// 一个bug找一天  = = 
+	d3dDevice->CreateConstantBufferView(
+		&cbvDesc1,
+		 handle1);
 }
 
 void MeowApp::BuildRootSignature()
 {
 	// 根参数可以是描述符表、根描述符、根常量
-	CD3DX12_ROOT_PARAMETER slotRootParameter[1];
+	CD3DX12_ROOT_PARAMETER slotRootParameter[2];
 	// 创建由单个CBV所组成的描述符表
 	CD3DX12_DESCRIPTOR_RANGE cbvTable;
 	cbvTable.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, // 描述符类型
 		1, // 描述符数量
 		0);// 描述符所绑定的寄存器槽号
 	slotRootParameter[0].InitAsDescriptorTable(1, &cbvTable);
+
+
+	// 创建由单个CBV所组成的描述符表
+	CD3DX12_DESCRIPTOR_RANGE cbvTable1;
+	cbvTable1.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, // 描述符类型
+		1, // 描述符数量
+		1);// 描述符所绑定的寄存器槽号
+	slotRootParameter[1].InitAsDescriptorTable(1, &cbvTable1);
+
+
 	// 根签名由一组根参数构成
-	CD3DX12_ROOT_SIGNATURE_DESC rootSig(1, // 根参数的数量 TODO: currently zero before constant buffer
+	CD3DX12_ROOT_SIGNATURE_DESC rootSig(2, // 根参数的数量 TODO: currently zero before constant buffer
 		slotRootParameter, // 根参数指针
 		0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
 	// 用单个寄存器槽来创建一个根签名，该槽位指向一个仅含有单个常量缓冲区的描述符区域
 	ComPtr<ID3DBlob> serializedRootSig = nullptr;
 	ComPtr<ID3DBlob> errorBlob = nullptr;
