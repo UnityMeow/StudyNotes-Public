@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\Common\d3dUtil.cpp" />
     <ClCompile Include="..\..\Common\GameTimer.cpp" />
+    <ClCompile Include="..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="D3D12App.cpp" />
     <ClCompile Include="MeowApp.cpp" />
     <ClCompile Include="WinMain.cpp" />

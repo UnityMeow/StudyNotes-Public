@@ -1,4 +1,5 @@
 ﻿#include "MeowApp.h"
+#include "../../Common/UploadBuffer.h"
 
 MeowApp::MeowApp(HINSTANCE hInstance)
 	:
@@ -20,7 +21,7 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 	CreateConstantBufferView();
 	BuildRootSignature();
 	BuildShadersAndInputLayout();
-	BuildTriangle();
+	BuildGeometry();
 	BuildPSO();
 
 	ThrowIfFailed(cmdList->Close());
@@ -106,10 +107,23 @@ void MeowApp::Draw()
 		handle);
 
 	//绘制顶点（通过索引缓冲区绘制）
-	cmdList->DrawIndexedInstanced(sizeof(indices), // 每个实例要绘制的索引数
+	cmdList->DrawIndexedInstanced(DrawArgs["box"].indexCount, // 每个实例要绘制的索引数
 		1,	// 实例化个数
-		0,	// 起始索引位置
-		0,	// 子物体起始索引在全局索引中的位置
+		DrawArgs["box"].startIndexLocation,	//起始索引位置
+		DrawArgs["box"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
+		0);	// 实例化的高级技术，暂时设置为0
+
+	//绘制顶点（通过索引缓冲区绘制）
+	cmdList->DrawIndexedInstanced(DrawArgs["cylinder"].indexCount, // 每个实例要绘制的索引数
+		1,	// 实例化个数
+		DrawArgs["cylinder"].startIndexLocation,	//起始索引位置
+		DrawArgs["cylinder"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
+		0);	// 实例化的高级技术，暂时设置为0
+	//绘制顶点（通过索引缓冲区绘制）
+	cmdList->DrawIndexedInstanced(DrawArgs["sphere"].indexCount, // 每个实例要绘制的索引数
+		1,	// 实例化个数
+		DrawArgs["sphere"].startIndexLocation,	//起始索引位置
+		DrawArgs["sphere"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
 		0);	// 实例化的高级技术，暂时设置为0
 
 	// 再次转换RT资源
@@ -291,8 +305,70 @@ void MeowApp::BuildShadersAndInputLayout()
 	};
 }
 
-void MeowApp::BuildTriangle()
+void MeowApp::BuildGeometry()
 {
+
+	GeometryGenerator geo;
+	GeometryGenerator::MeshData mBox = geo.CreateBox(1.5f, 0.5f, 1.5f, 3);
+	GeometryGenerator::MeshData mCylinder = geo.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
+	GeometryGenerator::MeshData mSphere = geo.CreateSphere(0.5f, 20, 20); 
+
+	UINT boxVertexOffset = 0;
+	UINT cylinderVertexOffset = mBox.Vertices.size();
+	UINT sphereVertexOffset = cylinderVertexOffset + mCylinder.Vertices.size();
+
+	UINT boxIndexOffset = 0;
+	UINT cylinderIndexOffset = mBox.Indices32.size();
+	UINT sphereIndexOffset = cylinderVertexOffset + mCylinder.Indices32.size();
+
+	size_t totalVertexCount = mBox.Vertices.size() + mCylinder.Vertices.size() + mSphere.Vertices.size();
+	std::vector<Vertex> vertices(totalVertexCount);	//给定顶点数组大小
+
+	int index = 0;
+	for (int i = 0; i < mBox.Vertices.size(); i++, index++)
+	{
+		vertices[index].Pos = mBox.Vertices[i].Position;
+		vertices[index].Color = XMFLOAT4(Colors::Green);
+	}
+	for (int i = 0; i < mCylinder.Vertices.size(); i++, index++)
+	{
+		vertices[index].Pos = mCylinder.Vertices[i].Position;
+		vertices[index].Color = XMFLOAT4(Colors::Blue);
+	}
+	for (int i = 0; i < mSphere.Vertices.size(); i++, index++)
+	{
+		vertices[index].Pos = mSphere.Vertices[i].Position;
+		vertices[index].Color = XMFLOAT4(Colors::Red);
+	}
+
+	std::vector<std::uint16_t> indices;
+	indices.insert(indices.end(), mBox.GetIndices16().begin(), mBox.GetIndices16().end());
+	indices.insert(indices.end(), mCylinder.GetIndices16().begin(), mCylinder.GetIndices16().end());
+	indices.insert(indices.end(), mSphere.GetIndices16().begin(), mSphere.GetIndices16().end());
+
+	SubmeshGeometry boxSubmesh;
+	boxSubmesh.indexCount = (UINT)mBox.Indices32.size();
+	boxSubmesh.baseVertexLocation = boxVertexOffset;
+	boxSubmesh.startIndexLocation = boxIndexOffset;
+
+	SubmeshGeometry cylinderSubmesh;
+	cylinderSubmesh.indexCount = (UINT)mCylinder.Indices32.size();
+	cylinderSubmesh.baseVertexLocation = cylinderVertexOffset;
+	cylinderSubmesh.startIndexLocation = cylinderIndexOffset;
+
+	SubmeshGeometry sphereSubmesh;
+	sphereSubmesh.indexCount = (UINT)mSphere.Indices32.size();
+	sphereSubmesh.baseVertexLocation = sphereVertexOffset;
+	sphereSubmesh.startIndexLocation = sphereIndexOffset;
+
+	DrawArgs["box"] = boxSubmesh;
+	DrawArgs["cylinder"] = cylinderSubmesh;
+	DrawArgs["sphere"] = sphereSubmesh;
+	
+	vbByteSize = (UINT)vertices.size() * sizeof(Vertex);
+	ibByteSize = (UINT)indices.size() * sizeof(std::uint16_t);
+
+
 	ThrowIfFailed(D3DCreateBlob(vbByteSize, &vertexBufferCpu));	// 创建顶点数据内存空间
 	ThrowIfFailed(D3DCreateBlob(ibByteSize, &indexBufferCpu));	// 创建索引数据内存空间
 
@@ -329,7 +405,7 @@ void MeowApp::BuildPSO()
 		D3D12_FILL_MODE_WIREFRAME以线框模式渲染立方体 
 		D3D12_FILL_MODE_SOLID以实体模式渲染立方体 
 	*/
-	// psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	 psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	/*	CullMode
 		D3D12_CULL_MODE_FRONT剔除正面朝向的三角形
 		D3D12_CULL_MODE_BACK剔除背面朝向的三角形

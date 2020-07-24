@@ -30,6 +30,9 @@
     <ClCompile Include="..\..\Common\GameTimer.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Common\GeometryGenerator.cpp">
+      <Filter>头文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D12App.h">
