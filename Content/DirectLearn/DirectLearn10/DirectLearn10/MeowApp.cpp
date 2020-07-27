@@ -269,7 +269,7 @@ void MeowApp::BuildShadersAndInputLayout()
 
 void MeowApp::BuildGeometry()
 {
-
+	// 有bug 待修改 待封装
 	GeometryGenerator geo;
 	GeometryGenerator::MeshData mBox = geo.CreateBox(1.5f, 0.5f, 1.5f, 3);
 	GeometryGenerator::MeshData mCylinder = geo.CreateCylinder(0.5f, 0.3f, 3.0f, 20, 20);
