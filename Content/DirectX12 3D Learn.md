@@ -820,6 +820,10 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
   ThrowIfFailed(d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PSO)));
   ```
 
+#### 渲染项
+
+存储单个几何体（包括模型实例）中渲染数据的一种数据结构
+
 ### 光照
 
 ### 纹理贴图

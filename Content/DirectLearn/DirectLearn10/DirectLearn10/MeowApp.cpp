@@ -18,10 +18,12 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 	ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), nullptr));
 
 	CreateDescriptorHeap();
-	CreateConstantBufferView();
+	
 	BuildRootSignature();
 	BuildShadersAndInputLayout();
 	BuildGeometry();
+	BuildRenderItem();
+	CreateConstantBufferView();
 	BuildPSO();
 
 	ThrowIfFailed(cmdList->Close());
@@ -75,56 +77,12 @@ void MeowApp::Draw()
 	// 设置根签名
 	cmdList->SetGraphicsRootSignature(rootSignature.Get());
 
-	// 设置顶点缓冲区
-	D3D12_VERTEX_BUFFER_VIEW vbv;
-	vbv.BufferLocation = vertexBufferGpu->GetGPUVirtualAddress();// 顶点缓冲区资源虚拟地址
-	vbv.SizeInBytes = vbByteSize;	// 顶点缓冲区大小（所有顶点数据大小）
-	vbv.StrideInBytes = sizeof(Vertex);	// 每个顶点元素所占用的字节数
-	cmdList->IASetVertexBuffers(0, 1, &vbv);
-
-	// 设置索引缓冲区
-	D3D12_INDEX_BUFFER_VIEW ibv;
-	ibv.BufferLocation = indexBufferGpu->GetGPUVirtualAddress();
-	ibv.Format = DXGI_FORMAT_R16_UINT;
-	ibv.SizeInBytes = ibByteSize;
-	cmdList->IASetIndexBuffer(&ibv);
-
-	// 将图元拓扑类型传入渲染管线
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	// 设置根描述符表
-	//cmdList->SetGraphicsRootDescriptorTable(0, /* 根参数的起始索引 */cbvHeap->GetGPUDescriptorHandleForHeapStart());
-	//设置根描述符表
-	int objCbvIndex = 0;
-	auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
-	handle.Offset(objCbvIndex, CbvSrvUavDesSize);
-	cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
-		handle);
-
-	int passCbvIndex = 1;
-	handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
-	handle.Offset(passCbvIndex, CbvSrvUavDesSize);
+	int passCbvIndex = (int)allRitems.size();
+	auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
+	passCbvHandle.Offset(passCbvIndex, CbvSrvUavDesSize);
 	cmdList->SetGraphicsRootDescriptorTable(1, //根参数的起始索引
-		handle);
-
-	//绘制顶点（通过索引缓冲区绘制）
-	cmdList->DrawIndexedInstanced(DrawArgs["box"].indexCount, // 每个实例要绘制的索引数
-		1,	// 实例化个数
-		DrawArgs["box"].startIndexLocation,	//起始索引位置
-		DrawArgs["box"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
-		0);	// 实例化的高级技术，暂时设置为0
-
-	//绘制顶点（通过索引缓冲区绘制）
-	cmdList->DrawIndexedInstanced(DrawArgs["cylinder"].indexCount, // 每个实例要绘制的索引数
-		1,	// 实例化个数
-		DrawArgs["cylinder"].startIndexLocation,	//起始索引位置
-		DrawArgs["cylinder"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
-		0);	// 实例化的高级技术，暂时设置为0
-	//绘制顶点（通过索引缓冲区绘制）
-	cmdList->DrawIndexedInstanced(DrawArgs["sphere"].indexCount, // 每个实例要绘制的索引数
-		1,	// 实例化个数
-		DrawArgs["sphere"].startIndexLocation,	//起始索引位置
-		DrawArgs["sphere"].baseVertexLocation,	//子物体起始索引在全局索引中的位置
-		0);	// 实例化的高级技术，暂时设置为0
+		passCbvHandle);
+	DrawRenderItems();
 
 	// 再次转换RT资源
 	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(swapChainBuffer[ref_mCurrentBackBuffer].Get(),
@@ -169,11 +127,18 @@ void MeowApp::Update()
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	// 相机的世界坐标
 	XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
-	//XMStoreFloat4x4(&view, v);
 
-	// 构建世界矩阵
-	XMMATRIX w = XMLoadFloat4x4(&world);
-	w *= XMMatrixTranslation(2.0f, 1.0f, 0.0f);
+
+	for (auto& item : allRitems)
+	{
+		world = item->world;
+		XMMATRIX w = XMLoadFloat4x4(&world);
+		// XMMATRIX赋值给XMFLOAT4X4
+		XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(w));
+		// 将世界矩阵数据拷贝至GPU缓存
+		objCB->CopyData(item->objCBIndex, objConstants);
+	}
+
 
 	// 构建投影矩阵
 	// 摄像机的屏幕坐标
@@ -184,12 +149,6 @@ void MeowApp::Update()
 	// XMMATRIX赋值给XMFLOAT4X4
 	XMStoreFloat4x4(&passConstants.viewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
 	passCB->CopyData(0, passConstants);
-
-	// XMMATRIX赋值给XMFLOAT4X4
-	XMStoreFloat4x4(&objConstants.world, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(w));
-	// 将数据拷贝至GPU缓存
-	objCB->CopyData(0, objConstants);
-	
 }
 
 void MeowApp::CreateDescriptorHeap()
@@ -205,28 +164,31 @@ void MeowApp::CreateDescriptorHeap()
 
 void MeowApp::CreateConstantBufferView()
 {
-	objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), 1, true);
+	// 物体总个数（包括实例）
+	UINT objectCount = (UINT)allRitems.size();
+	UINT objConstSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+	UINT passConstSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
 
-	UINT objCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
-	// 获得常量缓冲区首地址
-	D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objCB->Resource()->GetGPUVirtualAddress();
-	// 常量缓冲区子物体个数（子缓冲区个数）下标
-	int objCbElementIndex = 0;
-	cbAddress += (int64_t)objCbElementIndex * objCBByteSize;
-	// CBV堆中的CBV元素索引
-	int heapIndex = 0;
-	// 获得CBV堆首地址
-	auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
-	// CBV句柄（CBV堆中的CBV元素地址）
-	handle.Offset(heapIndex, CbvSrvUavDesSize);	
-	// 创建CBV描述符
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-	cbvDesc.BufferLocation = cbAddress;
-	cbvDesc.SizeInBytes = objCBByteSize;
-	d3dDevice->CreateConstantBufferView(
-		&cbvDesc,
-		handle);
+	objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), objectCount, true);
 
+	for (int i = 0; i < objectCount; i++)
+	{
+		// 获得常量缓冲区首地址
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objCB->Resource()->GetGPUVirtualAddress();
+		// 子物体在常量缓冲区中的地址
+		cbAddress += i * objConstSize;
+		// CBV堆中的CBV元素索引
+		int heapIndex = i;
+		// 获得CBV堆首地址
+		auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
+		// CBV句柄（CBV堆中的CBV元素地址）
+		handle.Offset(heapIndex, CbvSrvUavDesSize);	
+		//创建CBV描述符
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+		cbvDesc.BufferLocation = cbAddress;
+		cbvDesc.SizeInBytes = objConstSize;
+		d3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+	}
 
 	passCB = std::make_unique<UploadBuffer<PassConstants>>(d3dDevice.Get(), 1, true);
 
@@ -237,7 +199,7 @@ void MeowApp::CreateConstantBufferView()
 	int passCbElementIndex = 0;
 	cbAddressP += (int64_t)passCbElementIndex * passCBByteSize;
 	// CBV堆中的CBV元素索引
-	int heapIndex1 = 1;
+	int heapIndex1 = objectCount;
 	// 获得CBV堆首地址
 	auto handle1 = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
 	// CBV句柄（CBV堆中的CBV元素地址）
@@ -322,7 +284,7 @@ void MeowApp::BuildGeometry()
 	UINT sphereIndexOffset = cylinderVertexOffset + mCylinder.Indices32.size();
 
 	size_t totalVertexCount = mBox.Vertices.size() + mCylinder.Vertices.size() + mSphere.Vertices.size();
-	std::vector<Vertex> vertices(totalVertexCount);	//给定顶点数组大小
+	std::vector<Vertex> vertices(totalVertexCount);	// 给定顶点数组大小
 
 	int index = 0;
 	for (int i = 0; i < mBox.Vertices.size(); i++, index++)
@@ -382,6 +344,79 @@ void MeowApp::BuildGeometry()
 	indexBufferGpu = d3dUtil::CreateDefaultBuffer(d3dDevice.Get(), cmdList.Get(), indices.data(), ibByteSize, indexBufferUploader);
 }
 
+void MeowApp::BuildRenderItem()
+{
+
+	// 待封装 临时就先这么写吧~
+
+	std::unique_ptr<RenderItem> boxRitem = std::make_unique<RenderItem>();
+	// 构建物体世界矩阵
+	// XMMatrixScaling 建立一个沿x轴、y轴和z轴缩放的矩阵。
+	// XMMatrixTranslation 根据指定的偏移量构建转换矩阵。
+	XMStoreFloat4x4(&boxRitem->world, XMMatrixScaling(2.0f, 2.0f, 2.0f) * XMMatrixTranslation(0.0f, 0.5f, 0.0f));
+	// 设置世界矩阵在objConstantBuffer的索引
+	boxRitem->objCBIndex = 0;
+	// 设置图元拓扑类型
+	boxRitem->primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	// 设置索引数
+	boxRitem->indexCount = DrawArgs["box"].indexCount;
+	// 设置顶点偏移
+	boxRitem->baseVertexLocation = DrawArgs["box"].baseVertexLocation;
+	// 设置索引偏移
+	boxRitem->startIndexLocation = DrawArgs["box"].startIndexLocation;
+	// push
+	allRitems.push_back(std::move(boxRitem));
+	        
+	UINT fllowObjCBIndex = 1;
+	//将圆柱和圆的实例模型存入渲染项中
+	for (int i = 0; i < 5; i++)
+	{
+		auto leftCylinderRitem = std::make_unique<RenderItem>();
+		auto rightCylinderRitem = std::make_unique<RenderItem>();
+		auto leftSphereRitem = std::make_unique<RenderItem>();
+		auto rightSphereRitem = std::make_unique<RenderItem>();
+
+		XMMATRIX leftCylWorld = XMMatrixTranslation(-5.0f, 1.5f, -10.0f + i * 5.0f);
+		XMMATRIX rightCylWorld = XMMatrixTranslation(+5.0f, 1.5f, -10.0f + i * 5.0f);
+		XMMATRIX leftSphereWorld = XMMatrixTranslation(-5.0f, 3.5f, -10.0f + i * 5.0f);
+		XMMATRIX rightSphereWorld = XMMatrixTranslation(+5.0f, 3.5f, -10.0f + i * 5.0f);
+		//左边5个圆柱
+		XMStoreFloat4x4(&(leftCylinderRitem->world), leftCylWorld);
+		//此处的索引随着循环不断加1（注意：这里是先赋值再++）
+		leftCylinderRitem->objCBIndex = fllowObjCBIndex++;
+		leftCylinderRitem->primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		leftCylinderRitem->indexCount = DrawArgs["cylinder"].indexCount;
+		leftCylinderRitem->baseVertexLocation = DrawArgs["cylinder"].baseVertexLocation;
+		leftCylinderRitem->startIndexLocation = DrawArgs["cylinder"].startIndexLocation;
+		//右边5个圆柱
+		XMStoreFloat4x4(&(rightCylinderRitem->world), rightCylWorld);
+		rightCylinderRitem->objCBIndex = fllowObjCBIndex++;
+		rightCylinderRitem->primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		rightCylinderRitem->indexCount = DrawArgs["cylinder"].indexCount;
+		rightCylinderRitem->baseVertexLocation = DrawArgs["cylinder"].baseVertexLocation;
+		rightCylinderRitem->startIndexLocation = DrawArgs["cylinder"].startIndexLocation;
+		//左边5个球
+		XMStoreFloat4x4(&(leftSphereRitem->world), leftSphereWorld);
+		leftSphereRitem->objCBIndex = fllowObjCBIndex++;
+		leftSphereRitem->primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		leftSphereRitem->indexCount = DrawArgs["sphere"].indexCount;
+		leftSphereRitem->baseVertexLocation = DrawArgs["sphere"].baseVertexLocation;
+		leftSphereRitem->startIndexLocation = DrawArgs["sphere"].startIndexLocation;
+		//右边5个球
+		XMStoreFloat4x4(&(rightSphereRitem->world), rightSphereWorld);
+		rightSphereRitem->objCBIndex = fllowObjCBIndex++;
+		rightSphereRitem->primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		rightSphereRitem->indexCount = DrawArgs["sphere"].indexCount;
+		rightSphereRitem->baseVertexLocation = DrawArgs["sphere"].baseVertexLocation;
+		rightSphereRitem->startIndexLocation = DrawArgs["sphere"].startIndexLocation;
+
+		allRitems.push_back(std::move(leftCylinderRitem));
+		allRitems.push_back(std::move(rightCylinderRitem));
+		allRitems.push_back(std::move(leftSphereRitem));
+		allRitems.push_back(std::move(rightSphereRitem));
+	}
+}
+
 void MeowApp::BuildPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
@@ -405,7 +440,7 @@ void MeowApp::BuildPSO()
 		D3D12_FILL_MODE_WIREFRAME以线框模式渲染立方体 
 		D3D12_FILL_MODE_SOLID以实体模式渲染立方体 
 	*/
-	 psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
 	/*	CullMode
 		D3D12_CULL_MODE_FRONT剔除正面朝向的三角形
 		D3D12_CULL_MODE_BACK剔除背面朝向的三角形
@@ -422,6 +457,49 @@ void MeowApp::BuildPSO()
 	psoDesc.SampleDesc.Quality = 0;	//不使用4XMSAA
 
 	ThrowIfFailed(d3dDevice->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&PSO)));
+}
+
+void MeowApp::DrawRenderItems()
+{
+	//将智能指针数组转换成普通指针数组
+	std::vector<RenderItem*> ritems;
+	for (auto& e : allRitems)
+		ritems.push_back(e.get());
+
+	//遍历渲染项数组
+	for (size_t i = 0; i < ritems.size(); i++)
+	{
+		auto ritem = ritems[i];
+
+		// 设置顶点缓冲区
+		D3D12_VERTEX_BUFFER_VIEW vbv;
+		vbv.BufferLocation = vertexBufferGpu->GetGPUVirtualAddress();// 顶点缓冲区资源虚拟地址
+		vbv.SizeInBytes = vbByteSize;	// 顶点缓冲区大小（所有顶点数据大小）
+		vbv.StrideInBytes = sizeof(Vertex);	// 每个顶点元素所占用的字节数
+		cmdList->IASetVertexBuffers(0, 1, &vbv);
+
+		// 设置索引缓冲区
+		D3D12_INDEX_BUFFER_VIEW ibv;
+		ibv.BufferLocation = indexBufferGpu->GetGPUVirtualAddress();
+		ibv.Format = DXGI_FORMAT_R16_UINT;
+		ibv.SizeInBytes = ibByteSize;
+		cmdList->IASetIndexBuffer(&ibv);
+		cmdList->IASetPrimitiveTopology(ritem->primitiveType);
+
+		//设置根描述符表
+		UINT objCbvIndex = ritem->objCBIndex;
+		auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
+		handle.Offset(objCbvIndex, CbvSrvUavDesSize);
+		cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
+			handle);
+
+		//绘制顶点（通过索引缓冲区绘制）
+		cmdList->DrawIndexedInstanced(ritem->indexCount, //每个实例要绘制的索引数
+			1,	//实例化个数
+			ritem->startIndexLocation,	//起始索引位置
+			ritem->baseVertexLocation,	//子物体起始索引在全局索引中的位置
+			0);	//实例化的高级技术，暂时设置为0
+	}
 }
 
 void MeowApp::OnMouseDown(WPARAM btnState, int x, int y)

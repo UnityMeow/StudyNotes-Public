@@ -6,6 +6,22 @@
 using namespace DirectX;
 using namespace DirectX::PackedVector;
 
+struct RenderItem
+{
+	// 世界矩阵
+	XMFLOAT4X4 world = MathHelper::Identity4x4();
+	// 常量数据在objConstantBuffer中的索引
+	UINT objCBIndex = -1;
+	// 图元拓扑类型
+	D3D12_PRIMITIVE_TOPOLOGY primitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	// 索引数
+	UINT indexCount = 0;
+	// 索引偏移
+	UINT startIndexLocation = 0;
+	// 顶点偏移
+	UINT baseVertexLocation = 0;
+};
+
 struct Vertex
 {
 	XMFLOAT3 Pos;
@@ -70,6 +86,9 @@ class MeowApp : public D3D12App
 	float phi = XM_PIDIV4;
 	float radius = 10.0f;
 
+	// 所有要渲染的几何体
+	std::vector<std::unique_ptr<RenderItem>> allRitems;
+
 public:
 	MeowApp(HINSTANCE hInstance);
 	~MeowApp();
@@ -88,8 +107,11 @@ private:
 	void BuildShadersAndInputLayout();
 	// 构建几何体
 	void BuildGeometry();
+	void BuildRenderItem();
 	// 构建PSO
 	void BuildPSO();
+
+	void DrawRenderItems();
 
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;

@@ -54,9 +54,37 @@ reserve和resize的区别
 - resize(n); 调整容器的长度大小  调用之后容器的size即为n ，所有的空间都已经初始化了 可以直接访问
 - reserve(n); 预分配n个元素的内存空间 调用之后若容器的容量(capacity) < n,则重新分配内存空间从而使capacity = n  ， 预分配的空间没有被初始化 不可以访问
 
+### move
+
+std::move
+
+[待学习](https://www.cnblogs.com/tingshuo/archive/2013/01/22/2871328.html)
+
 ### 类型转换运算符
 
+更安全的类型强转
+
 [待整理](http://c.biancheng.net/cpp/biancheng/view/3297.html)
+
+### 智能指针
+
+- unique_ptr
+
+  [深入理解C++的unique_ptr](http://senlinzhan.github.io/2015/04/20/%E8%B0%88%E8%B0%88C-%E7%9A%84%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/)
+
+- make_unique
+
+  待整理
+
+- make_shared
+
+  待整理
+
+- weak_ptr
+
+  待整理
+
+- virtual-MObject 智能指针相关  待学习
 
 ## 原理
 
