@@ -92,4 +92,6 @@ protected:
 
 	float clientWidth = 1280;
 	float clientHeight = 720;
+
+	UINT64 mCurrentFence = 0;
 };

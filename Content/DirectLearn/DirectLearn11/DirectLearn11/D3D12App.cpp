@@ -381,7 +381,7 @@ void D3D12App::CreateViewPortAndScissorRect()
 
 void D3D12App::FlushCmdQueue()
 {
-	int mCurrentFence = 0;	// 初始CPU上的Fence值为0
+	mCurrentFence = 0;// 初始CPU上的Fence值为0
 	mCurrentFence++;	// CPU传完命令并关闭后，将当前Fence值+1
 	cmdQueue->Signal(fence.Get(), mCurrentFence);	// 当 GPU 处理完 CPU 传入的命令后，将 fence接口中 的fence+1，即fence->GetCompletedValue()+1
 

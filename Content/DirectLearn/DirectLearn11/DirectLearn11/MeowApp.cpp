@@ -17,12 +17,12 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 		return false;
 	ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), nullptr));
 
-	CreateDescriptorHeap();
-	
 	BuildRootSignature();
 	BuildShadersAndInputLayout();
 	BuildGeometry();
 	BuildRenderItem();
+
+	CreateDescriptorHeap();
 	CreateConstantBufferView();
 	BuildPSO();
 
@@ -30,7 +30,7 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 	ID3D12CommandList* cmdLists[] = { cmdList.Get() };
 	cmdQueue->ExecuteCommandLists(_countof(cmdLists), cmdLists);
 
-	FlushCmdQueue();
+	//FlushCmdQueue();
 	return true;
 }
 
@@ -101,7 +101,15 @@ void MeowApp::Draw()
 	ref_mCurrentBackBuffer = (ref_mCurrentBackBuffer + 1) % 2;
 
 	// 设置fence值，刷新命令队列，使CPU和GPU同步
-	FlushCmdQueue();
+	//FlushCmdQueue();
+
+	// Advance the fence value to mark commands up to this fence point.
+	mCurrFrameResource->fenceCPU = ++mCurrentFence;
+
+	// Add an instruction to the command queue to set a new fence point. 
+	// Because we are on the GPU timeline, the new fence point won't be 
+	// set until the GPU finishes processing all the commands prior to this Signal().
+	cmdQueue->Signal(fence.Get(), mCurrentFence);
 }
 
 void MeowApp::OnResize()
@@ -115,8 +123,40 @@ void MeowApp::OnResize()
 
 void MeowApp::Update()
 {
+
+	// 每帧遍历一个帧资源（多帧的话就是环形遍历）
+	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+	mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
+
+	// GPU是否完成了对当前帧资源命令的处理?
+	// 如果不是，等待直到GPU完成命令到这个fence。
+	if (mCurrFrameResource->fenceCPU != 0 && fence->GetCompletedValue() < mCurrFrameResource->fenceCPU)
+	{
+		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		ThrowIfFailed(fence->SetEventOnCompletion(mCurrFrameResource->fenceCPU, eventHandle));
+		WaitForSingleObject(eventHandle, INFINITE);
+		CloseHandle(eventHandle);
+	}
+
+
 	ObjectConstants objConstants;
 	PassConstants passConstants;
+
+	for (auto& item : allRitems)
+	{
+		if (item->NumFramesDirty > 0)
+		{
+
+			world = item->world;
+			XMMATRIX w = XMLoadFloat4x4(&world);
+			// XMMATRIX赋值给XMFLOAT4X4
+			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(w));
+			// 将世界矩阵数据拷贝至GPU缓存
+			objCB->CopyData(item->objCBIndex, objConstants);
+
+			item->NumFramesDirty--;
+		}
+	}
 	
 	float x = radius * sinf(phi) * cosf(theta);
 	float y = radius * cosf(phi);
@@ -127,18 +167,6 @@ void MeowApp::Update()
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	// 相机的世界坐标
 	XMMATRIX v = XMMatrixLookAtLH(pos, target, up);
-
-
-	for (auto& item : allRitems)
-	{
-		world = item->world;
-		XMMATRIX w = XMLoadFloat4x4(&world);
-		// XMMATRIX赋值给XMFLOAT4X4
-		XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(w));
-		// 将世界矩阵数据拷贝至GPU缓存
-		objCB->CopyData(item->objCBIndex, objConstants);
-	}
-
 
 	// 构建投影矩阵
 	// 摄像机的屏幕坐标
@@ -154,7 +182,7 @@ void MeowApp::Update()
 void MeowApp::CreateDescriptorHeap()
 {
 	D3D12_DESCRIPTOR_HEAP_DESC cbvHeapDesc;
-	cbvHeapDesc.NumDescriptors = 2;
+	cbvHeapDesc.NumDescriptors = ( (UINT)allRitems.size() + 1 ) * FrameResourcesCount;
 	cbvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	cbvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	cbvHeapDesc.NodeMask = 0;
@@ -167,51 +195,58 @@ void MeowApp::CreateConstantBufferView()
 	// 物体总个数（包括实例）
 	UINT objectCount = (UINT)allRitems.size();
 	UINT objConstSize = d3dUtil::CalcConstantBufferByteSize(sizeof(ObjectConstants));
+
 	UINT passConstSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
 
 	objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), objectCount, true);
-
-	for (int i = 0; i < objectCount; i++)
+	for (int frameIndex = 0; frameIndex < FrameResourcesCount; frameIndex++)
 	{
-		// 获得常量缓冲区首地址
-		D3D12_GPU_VIRTUAL_ADDRESS cbAddress = objCB->Resource()->GetGPUVirtualAddress();
-		// 子物体在常量缓冲区中的地址
-		cbAddress += i * objConstSize;
-		// CBV堆中的CBV元素索引
-		int heapIndex = i;
-		// 获得CBV堆首地址
-		auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
-		// CBV句柄（CBV堆中的CBV元素地址）
-		handle.Offset(heapIndex, CbvSrvUavDesSize);	
-		//创建CBV描述符
-		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
-		cbvDesc.BufferLocation = cbAddress;
-		cbvDesc.SizeInBytes = objConstSize;
-		d3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+		for (int i = 0; i < objectCount; i++)
+		{
+			// 获得常量缓冲区首地址
+			D3D12_GPU_VIRTUAL_ADDRESS cbAddress = mFrameResources[frameIndex]->objCB->Resource()->GetGPUVirtualAddress();
+			// 子物体在常量缓冲区中的地址
+			cbAddress += i * objConstSize;
+			// CBV堆中的CBV元素索引
+			int heapIndex = objectCount * frameIndex + i;
+			// 获得CBV堆首地址
+			auto handle = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
+			// CBV句柄（CBV堆中的CBV元素地址）
+			handle.Offset(heapIndex, CbvSrvUavDesSize);
+			//创建CBV描述符
+			D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc;
+			cbvDesc.BufferLocation = cbAddress;
+			cbvDesc.SizeInBytes = objConstSize;
+			d3dDevice->CreateConstantBufferView(&cbvDesc, handle);
+		}
 	}
 
 	passCB = std::make_unique<UploadBuffer<PassConstants>>(d3dDevice.Get(), 1, true);
 
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
-	// 获得常量缓冲区首地址
-	D3D12_GPU_VIRTUAL_ADDRESS cbAddressP = passCB->Resource()->GetGPUVirtualAddress();
-	// 常量缓冲区子物体个数（子缓冲区个数）下标
-	int passCbElementIndex = 0;
-	cbAddressP += (int64_t)passCbElementIndex * passCBByteSize;
-	// CBV堆中的CBV元素索引
-	int heapIndex1 = objectCount;
-	// 获得CBV堆首地址
-	auto handle1 = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
-	// CBV句柄（CBV堆中的CBV元素地址）
-	handle1.Offset(heapIndex1, CbvSrvUavDesSize);
-	// 创建CBV描述符
-	D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc1;
-	cbvDesc1.BufferLocation = cbAddressP;
-	cbvDesc1.SizeInBytes = passCBByteSize;
-	// 一个bug找一天  = = 
-	d3dDevice->CreateConstantBufferView(
-		&cbvDesc1,
-		 handle1);
+
+	for (int frameIndex = 0; frameIndex < FrameResourcesCount; frameIndex++)
+	{
+		// 获得常量缓冲区首地址
+		D3D12_GPU_VIRTUAL_ADDRESS cbAddressP = mFrameResources[frameIndex]->passCB->Resource()->GetGPUVirtualAddress();
+		// 常量缓冲区子物体个数（子缓冲区个数）下标
+		int passCbElementIndex = 0;
+		cbAddressP += (int64_t)passCbElementIndex * passCBByteSize;
+		// CBV堆中的CBV元素索引
+		int heapIndex1 = objectCount * FrameResourcesCount + frameIndex;
+		// 获得CBV堆首地址
+		auto handle1 = CD3DX12_CPU_DESCRIPTOR_HANDLE(cbvHeap->GetCPUDescriptorHandleForHeapStart());
+		// CBV句柄（CBV堆中的CBV元素地址）
+		handle1.Offset(heapIndex1, CbvSrvUavDesSize);
+		// 创建CBV描述符
+		D3D12_CONSTANT_BUFFER_VIEW_DESC cbvDesc1;
+		cbvDesc1.BufferLocation = cbAddressP;
+		cbvDesc1.SizeInBytes = passCBByteSize;
+		// 一个bug找一天  = = 
+		d3dDevice->CreateConstantBufferView(
+			&cbvDesc1,
+			handle1);
+	}
 }
 
 void MeowApp::BuildRootSignature()
@@ -499,6 +534,14 @@ void MeowApp::DrawRenderItems()
 			ritem->startIndexLocation,	//起始索引位置
 			ritem->baseVertexLocation,	//子物体起始索引在全局索引中的位置
 			0);	//实例化的高级技术，暂时设置为0
+	}
+}
+
+void MeowApp::BuildFrameResources()
+{
+	for (int i = 0; i < FrameResourcesCount; i++)
+	{
+		mFrameResources.push_back(std::make_unique<FrameResource>(d3dDevice.Get(),1,/*passCount*/(UINT)allRitems.size()));	//objCount
 	}
 }
 

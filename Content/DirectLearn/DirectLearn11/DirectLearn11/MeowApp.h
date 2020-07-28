@@ -3,8 +3,12 @@
 #include <DirectXPackedVector.h>
 #include "../../Common/UploadBuffer.h"
 #include "../../Common/GeometryGenerator.h"
+#include "FrameResource.h"
 using namespace DirectX;
 using namespace DirectX::PackedVector;
+
+// 始终保持至少并行三帧
+const int FrameResourcesCount = 3;
 
 struct RenderItem
 {
@@ -20,6 +24,8 @@ struct RenderItem
 	UINT startIndexLocation = 0;
 	// 顶点偏移
 	UINT baseVertexLocation = 0;
+
+	int NumFramesDirty = FrameResourcesCount;
 };
 
 struct Vertex
@@ -89,6 +95,10 @@ class MeowApp : public D3D12App
 	// 所有要渲染的几何体
 	std::vector<std::unique_ptr<RenderItem>> allRitems;
 
+	std::vector<std::unique_ptr<FrameResource>> mFrameResources;
+	FrameResource* mCurrFrameResource = nullptr;
+	int mCurrFrameResourceIndex = 0;
+
 public:
 	MeowApp(HINSTANCE hInstance);
 	~MeowApp();
@@ -112,6 +122,8 @@ private:
 	void BuildPSO();
 
 	void DrawRenderItems();
+	// 填充帧资源数组
+	void BuildFrameResources();
 
 	virtual void OnMouseDown(WPARAM btnState, int x, int y) override;
 	virtual void OnMouseUp(WPARAM btnState, int x, int y) override;
