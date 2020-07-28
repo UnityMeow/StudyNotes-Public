@@ -319,7 +319,7 @@ void MeowApp::BuildGeometry()
 
 	UINT boxIndexOffset = 0;
 	UINT cylinderIndexOffset = mBox.Indices32.size();
-	UINT sphereIndexOffset = cylinderVertexOffset + mCylinder.Indices32.size();
+	UINT sphereIndexOffset = cylinderIndexOffset + mCylinder.Indices32.size();
 
 	size_t totalVertexCount = mBox.Vertices.size() + mCylinder.Vertices.size() + mSphere.Vertices.size();
 	std::vector<Vertex> vertices(totalVertexCount);	//给定顶点数组大小

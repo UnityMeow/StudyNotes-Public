@@ -281,7 +281,7 @@ void MeowApp::BuildGeometry()
 
 	UINT boxIndexOffset = 0;
 	UINT cylinderIndexOffset = mBox.Indices32.size();
-	UINT sphereIndexOffset = cylinderVertexOffset + mCylinder.Indices32.size();
+	UINT sphereIndexOffset = cylinderIndexOffset + mCylinder.Indices32.size();
 
 	size_t totalVertexCount = mBox.Vertices.size() + mCylinder.Vertices.size() + mSphere.Vertices.size();
 	std::vector<Vertex> vertices(totalVertexCount);	// 给定顶点数组大小
@@ -440,7 +440,7 @@ void MeowApp::BuildPSO()
 		D3D12_FILL_MODE_WIREFRAME以线框模式渲染立方体 
 		D3D12_FILL_MODE_SOLID以实体模式渲染立方体 
 	*/
-	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 	/*	CullMode
 		D3D12_CULL_MODE_FRONT剔除正面朝向的三角形
 		D3D12_CULL_MODE_BACK剔除背面朝向的三角形

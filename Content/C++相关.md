@@ -56,7 +56,7 @@ reserve和resize的区别
 
 ### move
 
-std::move
+std::move  把左值变右值
 
 [待学习](https://www.cnblogs.com/tingshuo/archive/2013/01/22/2871328.html)
 
