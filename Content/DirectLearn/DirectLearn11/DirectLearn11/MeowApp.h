@@ -28,21 +28,21 @@ struct RenderItem
 	int NumFramesDirty = FrameResourcesCount;
 };
 
-struct Vertex
-{
-	XMFLOAT3 Pos;
-	XMFLOAT4 Color;
-};
-
-struct ObjectConstants
-{
-	XMFLOAT4X4 world = MathHelper::Identity4x4();
-};
-
-struct PassConstants
-{
-	XMFLOAT4X4 viewProj = MathHelper::Identity4x4();
-};
+//struct Vertex
+//{
+//	XMFLOAT3 Pos;
+//	XMFLOAT4 Color;
+//};
+//
+//struct ObjectConstants
+//{
+//	XMFLOAT4X4 world = MathHelper::Identity4x4();
+//};
+//
+//struct PassConstants
+//{
+//	XMFLOAT4X4 viewProj = MathHelper::Identity4x4();
+//};
 
 class MeowApp : public D3D12App
 {
@@ -73,8 +73,6 @@ class MeowApp : public D3D12App
 	ComPtr<ID3D12RootSignature> rootSignature = nullptr;
 	// CBV
 	ComPtr<ID3D12DescriptorHeap> cbvHeap = nullptr;
-	std::unique_ptr<UploadBuffer<ObjectConstants>> objCB = nullptr;
-	std::unique_ptr<UploadBuffer<PassConstants>> passCB = nullptr;
 
 	// PSO
 	ComPtr<ID3D12PipelineState> PSO = nullptr;

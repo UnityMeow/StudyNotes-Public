@@ -86,7 +86,7 @@ protected:
 
 	// MSAA质量等级
 	D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS MSAAQL;
-
+		
 	//GameTime类实例声明
 	GameTimer gt;
 

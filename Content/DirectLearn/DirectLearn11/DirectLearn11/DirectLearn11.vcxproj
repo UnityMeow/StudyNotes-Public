@@ -143,11 +143,13 @@
     <ClCompile Include="..\..\Common\GameTimer.cpp" />
     <ClCompile Include="..\..\Common\GeometryGenerator.cpp" />
     <ClCompile Include="D3D12App.cpp" />
+    <ClCompile Include="FrameResources.cpp" />
     <ClCompile Include="MeowApp.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D12App.h" />
+    <ClInclude Include="FrameResource.h" />
     <ClInclude Include="MeowApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

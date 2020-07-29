@@ -11,13 +11,13 @@ using namespace Microsoft::WRL;
 struct Vertex
 {
 	XMFLOAT3 Pos;
-	XMCOLOR Color;
+	XMFLOAT4 Color;
 };
 
 // 单个物体的物体常量数据（不变的）
 struct ObjectConstants
 {
-	DirectX::XMFLOAT4X4 World = MathHelper::Identity4x4();
+	DirectX::XMFLOAT4X4 world = MathHelper::Identity4x4();
 };
 
 // 单个物体的过程常量数据（每帧变化）

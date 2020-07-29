@@ -1,5 +1,6 @@
 ﻿#include "MeowApp.h"
-#include "../../Common/UploadBuffer.h"
+
+
 
 MeowApp::MeowApp(HINSTANCE hInstance)
 	:
@@ -21,7 +22,7 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 	BuildShadersAndInputLayout();
 	BuildGeometry();
 	BuildRenderItem();
-
+	BuildFrameResources();
 	CreateDescriptorHeap();
 	CreateConstantBufferView();
 	BuildPSO();
@@ -37,6 +38,7 @@ bool MeowApp::Init(HINSTANCE hInstance, int nShowCmd)
 void MeowApp::Draw()
 {
 	Update();
+	auto currCmdAllocator = mCurrFrameResource->cmdAllocator;
 	ThrowIfFailed(cmdAllocator->Reset());// 重复使用记录 命令 的相关内存
 	// cmdList->SetPipelineState(PSO.Get());
 	ThrowIfFailed(cmdList->Reset(cmdAllocator.Get(), PSO.Get()));// 复用命令列表及其内存
@@ -77,7 +79,7 @@ void MeowApp::Draw()
 	// 设置根签名
 	cmdList->SetGraphicsRootSignature(rootSignature.Get());
 
-	int passCbvIndex = (int)allRitems.size();
+	int passCbvIndex = (int)allRitems.size() * FrameResourcesCount + mCurrFrameResourceIndex;
 	auto passCbvHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
 	passCbvHandle.Offset(passCbvIndex, CbvSrvUavDesSize);
 	cmdList->SetGraphicsRootDescriptorTable(1, //根参数的起始索引
@@ -125,14 +127,14 @@ void MeowApp::Update()
 {
 
 	// 每帧遍历一个帧资源（多帧的话就是环形遍历）
-	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % gNumFrameResources;
+	mCurrFrameResourceIndex = (mCurrFrameResourceIndex + 1) % FrameResourcesCount;
 	mCurrFrameResource = mFrameResources[mCurrFrameResourceIndex].get();
 
 	// GPU是否完成了对当前帧资源命令的处理?
 	// 如果不是，等待直到GPU完成命令到这个fence。
 	if (mCurrFrameResource->fenceCPU != 0 && fence->GetCompletedValue() < mCurrFrameResource->fenceCPU)
 	{
-		HANDLE eventHandle = CreateEventEx(nullptr, false, false, EVENT_ALL_ACCESS);
+		HANDLE eventHandle = CreateEventEx(nullptr, (LPCWSTR)false, false, EVENT_ALL_ACCESS);
 		ThrowIfFailed(fence->SetEventOnCompletion(mCurrFrameResource->fenceCPU, eventHandle));
 		WaitForSingleObject(eventHandle, INFINITE);
 		CloseHandle(eventHandle);
@@ -152,7 +154,7 @@ void MeowApp::Update()
 			// XMMATRIX赋值给XMFLOAT4X4
 			XMStoreFloat4x4(&objConstants.world, XMMatrixTranspose(w));
 			// 将世界矩阵数据拷贝至GPU缓存
-			objCB->CopyData(item->objCBIndex, objConstants);
+			mCurrFrameResource->objCB->CopyData(item->objCBIndex, objConstants);
 
 			item->NumFramesDirty--;
 		}
@@ -176,7 +178,7 @@ void MeowApp::Update()
 
 	// XMMATRIX赋值给XMFLOAT4X4
 	XMStoreFloat4x4(&passConstants.viewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
-	passCB->CopyData(0, passConstants);
+	mCurrFrameResource->passCB->CopyData(0, passConstants);
 }
 
 void MeowApp::CreateDescriptorHeap()
@@ -198,7 +200,7 @@ void MeowApp::CreateConstantBufferView()
 
 	UINT passConstSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
 
-	objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), objectCount, true);
+	//objCB = std::make_unique<UploadBuffer<ObjectConstants>>(d3dDevice.Get(), objectCount, true);
 	for (int frameIndex = 0; frameIndex < FrameResourcesCount; frameIndex++)
 	{
 		for (int i = 0; i < objectCount; i++)
@@ -220,8 +222,6 @@ void MeowApp::CreateConstantBufferView()
 			d3dDevice->CreateConstantBufferView(&cbvDesc, handle);
 		}
 	}
-
-	passCB = std::make_unique<UploadBuffer<PassConstants>>(d3dDevice.Get(), 1, true);
 
 	UINT passCBByteSize = d3dUtil::CalcConstantBufferByteSize(sizeof(PassConstants));
 
@@ -522,7 +522,7 @@ void MeowApp::DrawRenderItems()
 		cmdList->IASetPrimitiveTopology(ritem->primitiveType);
 
 		//设置根描述符表
-		UINT objCbvIndex = ritem->objCBIndex;
+		UINT objCbvIndex = mCurrFrameResourceIndex * (UINT)allRitems.size() + ritem->objCBIndex;
 		auto handle = CD3DX12_GPU_DESCRIPTOR_HANDLE(cbvHeap->GetGPUDescriptorHandleForHeapStart());
 		handle.Offset(objCbvIndex, CbvSrvUavDesSize);
 		cmdList->SetGraphicsRootDescriptorTable(0, //根参数的起始索引
