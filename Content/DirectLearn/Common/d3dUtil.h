@@ -214,11 +214,17 @@ struct MeshGeometry
 
 struct Light
 {
+    // 光源颜色（三光通用）
     DirectX::XMFLOAT3 Strength = { 0.5f, 0.5f, 0.5f };
+    // 点光灯和聚光灯的开始衰减距离
     float FalloffStart = 1.0f;                          // point/spot light only
+    // 方向光和聚光灯的方向向量
     DirectX::XMFLOAT3 Direction = { 0.0f, -1.0f, 0.0f };// directional/spot light only
+    // 点光和聚光灯的衰减结束距离
     float FalloffEnd = 10.0f;                           // point/spot light only
+    // 点光和聚光灯的坐标
     DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };  // point/spot light only
+    // 聚光灯因子中的参数
     float SpotPower = 64.0f;                            // spot light only
 };
 
@@ -238,27 +244,29 @@ struct MaterialConstants
 // would likely create a class hierarchy of Materials.
 struct Material
 {
-	// Unique material name for lookup.
+	// 用于查找材质的唯一名称
 	std::string Name;
 
-	// Index into constant buffer corresponding to this material.
+	// 索引到与此材质对应的常量缓冲区
 	int MatCBIndex = -1;
 
-	// Index into SRV heap for diffuse texture.
+	// 漫反射纹理的SRV堆索引
 	int DiffuseSrvHeapIndex = -1;
 
-	// Index into SRV heap for normal texture.
+	// 法线纹理的SRV堆索引
 	int NormalSrvHeapIndex = -1;
 
-	// Dirty flag indicating the material has changed and we need to update the constant buffer.
+	// 脏标记，表示材质已经改变，需要更新常量缓冲区。
 	// Because we have a material constant buffer for each FrameResource, we have to apply the
 	// update to each FrameResource.  Thus, when we modify a material we should set 
 	// NumFramesDirty = gNumFrameResources so that each frame resource gets the update.
-	int NumFramesDirty = gNumFrameResources;
+	int NumFramesDirty = 3;
 
-	// Material constant buffer data used for shading.
+	// 用于阴影的材质常量缓冲数据
 	DirectX::XMFLOAT4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+    // RF(0)值，即材质的反射属性
 	DirectX::XMFLOAT3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+    // 材质的粗糙度
 	float Roughness = .25f;
 	DirectX::XMFLOAT4X4 MatTransform = MathHelper::Identity4x4();
 };
