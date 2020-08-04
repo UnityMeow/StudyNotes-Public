@@ -177,7 +177,7 @@ void MeowApp::Update()
 	XMMATRIX WVP_Matrix = v * p;
 
 	// XMMATRIX赋值给XMFLOAT4X4
-	XMStoreFloat4x4(&passConstants.viewProj, /*由于CPU与GPU是相反的所以要逆一下*/XMMatrixTranspose(WVP_Matrix));
+	XMStoreFloat4x4(&passConstants.viewProj, /*由于CPU与GPU是相反的所以要转置一下*/XMMatrixTranspose(WVP_Matrix));
 	mCurrFrameResource->passCB->CopyData(0, passConstants);
 }
 

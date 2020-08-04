@@ -1017,6 +1017,16 @@ _MainTex.Sample(sampler_MainTex, i.uv);
 Texture2D<float4> _MainTex;
 SamplerState sampler_MainTex;
 
+
+
+### HLSL
+
+#### 内置函数
+
+https://www.cnblogs.com/X-Jun/p/12246859.html#_lab2_4_0
+
+https://blog.csdn.net/eloudy/article/details/71258367
+
 ### 混合
 
 ### 计算着色器
