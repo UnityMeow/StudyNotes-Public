@@ -1,0 +1,343 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &101100000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: _Humanoid And Add-Bone
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: info
+    m_Weight: 0
+  - m_Path: Root
+    m_Weight: 1
+  - m_Path: Root/center
+    m_Weight: 1
+  - m_Path: Root/center/Hips
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Accessory_SpineRibbon_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Armor_Shoulder_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Elbow_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Index_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Index_Proximal/Finger_L_Index_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Index_Proximal/Finger_L_Index_Intermediate/Finger_L_Index_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Middle_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Middle_Proximal/Finger_L_Middle_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Middle_Proximal/Finger_L_Middle_Intermediate/Finger_L_Middle_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Pinky_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Pinky_Proximal/Finger_L_Pinky_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Pinky_Proximal/Finger_L_Pinky_Intermediate/Finger_L_Pinky_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Ring_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Ring_Proximal/Finger_L_Ring_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Ring_Proximal/Finger_L_Ring_Intermediate/Finger_L_Ring_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Thumb_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Thumb_Proximal/Finger_L_Thumb_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Finger_L_Thumb_Proximal/Finger_L_Thumb_Intermediate/Finger_L_Thumb_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Hand_L/Prop_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Lower_Arm_L_twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Sleeve_Bell_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Sleeve_Bell_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Sleeve_Bell_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L/Sleeve_Bell_L_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Upper_Arm_L_twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Armor_Shoulder_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Elbow_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Index_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Index_Proximal/Finger_R_Index_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Index_Proximal/Finger_R_Index_Intermediate/Finger_R_Index_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Middle_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Middle_Proximal/Finger_R_Middle_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Middle_Proximal/Finger_R_Middle_Intermediate/Finger_R_Middle_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Pinky_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Pinky_Proximal/Finger_R_Pinky_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Pinky_Proximal/Finger_R_Pinky_Intermediate/Finger_R_Pinky_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Ring_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Ring_Proximal/Finger_R_Ring_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Ring_Proximal/Finger_R_Ring_Intermediate/Finger_R_Ring_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Thumb_Proximal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Thumb_Proximal/Finger_R_Thumb_Intermediate
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Finger_R_Thumb_Proximal/Finger_R_Thumb_Intermediate/Finger_R_Thumb_Distal
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Hand_R/Prop_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Lower_Arm_R_twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Sleeve_Bell_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Sleeve_Bell_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Sleeve_Bell_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R/Sleeve_Bell_R_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Upper_Arm_R_twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Manteau_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Manteau_L_00/Manteau_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Manteau_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Manteau_R_00/Manteau_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Eye_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Eye_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Face_BlendShapes
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_L_00/Hair_DownTwinTail_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_L_00/Hair_DownTwinTail_L_01/Hair_DownTwinTail_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_R_00/Hair_DownTwinTail_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_R_00/Hair_DownTwinTail_R_01/Hair_DownTwinTail_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Front_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Front_00/Hair_Front_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02/Hair_Ponytail_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02/Hair_Ponytail_03/Hair_Ponytail_04
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_L_00/Hair_Ribbon_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_L_00/Hair_Ribbon_L_01/Hair_Ribbon_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_R_00/Hair_Ribbon_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_R_00/Hair_Ribbon_R_01/Hair_Ribbon_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Side_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Side_L_00/Hair_Side_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Side_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Side_R_00/Hair_Side_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00/Hair_SideLong_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00/Hair_SideLong_L_01/Hair_SideLong_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00/Hair_SideLong_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00/Hair_SideLong_R_01/Hair_SideLong_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00/Hair_UpTwintail_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00/Hair_UpTwintail_L_01/Hair_UpTwintail_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00/Hair_UpTwintail_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00/Hair_UpTwintail_R_01/Hair_UpTwintail_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Jaw
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_L_00/Shawl_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_R_00/Shawl_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01/Skirt_Back_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01/Skirt_Back_L_02/Skirt_Back_L_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01/Skirt_Back_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01/Skirt_Back_R_02/Skirt_Back_R_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Center_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Center_00/Skirt_Center_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01/Skirt_Front_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01/Skirt_Front_L_02/Skirt_Front_L_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01/Skirt_Front_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01/Skirt_Front_R_02/Skirt_Front_R_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_L_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01/Skirt_Side_L_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01/Skirt_Side_L_02/Skirt_Side_L_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_R_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01/Skirt_Side_R_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01/Skirt_Side_R_02/Skirt_Side_R_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Tail_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Tail_00/Tail_01
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Tail_00/Tail_01/Tail_02
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Tail_00/Tail_01/Tail_02/Tail_03
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Tail_00/Tail_01/Tail_02/Tail_03/Tail_04
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Lower_Leg_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Lower_Leg_L/Foot_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Lower_Leg_L/Foot_L/Toes_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Lower_Leg_L/Knee_L
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Lower_Leg_L/Lower_Leg_L_Twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_L/Upper_Leg_L_Twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Lower_Leg_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Lower_Leg_R/Foot_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Lower_Leg_R/Foot_R/Toes_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Lower_Leg_R/Knee_R
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Lower_Leg_R/Lower_Leg_R_Twist_00
+    m_Weight: 1
+  - m_Path: Root/center/Hips/Upper_Leg_R/Upper_Leg_R_Twist_00
+    m_Weight: 1
+  - m_Path: Root_Dummy_Meshs
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/Body_A
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/Body_B
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/Body_Eye
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/Body_FingerFootEnd
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/MsakGuide_HaonsSDKohaku-Chanz_add-bone_Allset
+    m_Weight: 0
+  - m_Path: Root_Dummy_Meshs/MsakGuide_HaonsSDKohaku-Chanz_add-bone_DefaultSet
+    m_Weight: 0
