@@ -8,16 +8,17 @@ public unsafe class MeowSkinned : MonoBehaviour
     /// </summary>
     private Mesh mesh;
     /// <summary>
-    /// 每个骨骼预定义bone的 bone空间 到 mesh空间 的变换矩阵的 逆矩阵
-    /// 直白一点就是 mesh相对于骨骼的坐标
+    /// mesh转换骨骼空间坐标系 
+    /// (mesh->bone)
     /// </summary>
     private Matrix4x4[] bindPoses;
     /// <summary>
     /// 骨骼信息
+    /// bones.localToWorldMatrix (bone->world)
     /// </summary>
     private Transform[] bones;
     /// <summary>
-    /// 骨骼的相对位置
+    /// mesh->world
     /// </summary>
     private Matrix4x4[] bonePositions;
     /// <summary>
@@ -52,22 +53,22 @@ public unsafe class MeowSkinned : MonoBehaviour
         mesh = meshRenderer.sharedMesh;
         bindPoses = mesh.bindposes;
         boneWeights = mesh.boneWeights;
+
         bones = new Transform[meshRenderer.bones.Length];
         for (uint i = 0; i < bones.Length; ++i)
         {
             bones[i] = meshRenderer.bones[i];
         }
 
-     
         bonePositionBuffer = new ComputeBuffer(
             bones.Length,
             sizeof(Matrix4x4));
         boneWeightBuffer = new ComputeBuffer(
             boneWeights.Length,
             sizeof(BoneWeight));
-
-      
+ 
         boneWeightBuffer.SetData(boneWeights);
+
         bonePositions = new Matrix4x4[bones.Length];
         filter = gameObject.AddComponent<MeshFilter>();
         filter.sharedMesh = mesh;
@@ -78,13 +79,13 @@ public unsafe class MeowSkinned : MonoBehaviour
 
     private void Update()
     {
-        //计算每根骨骼的相对位置
         for (int i = 0; i < bonePositions.Length; ++i)
         {
-            bonePositions[i] = bones[i].localToWorldMatrix * bindPoses[i];
+            // mesh坐标系转世界坐标系
+            bonePositions[i] = bones[i].localToWorldMatrix/* 骨骼坐标系转世界坐标系 */ * bindPoses[i]/* mesh坐标系转骨骼坐标系 */;
         }
         bonePositionBuffer.SetData(bonePositions);
-        //向GPU传值
+        // 向GPU传值
         rendererBlock.Clear();
         rendererBlock.SetBuffer("_BoneWeightsBuffer", boneWeightBuffer);
         rendererBlock.SetBuffer("_BonePositionBuffer", bonePositionBuffer);

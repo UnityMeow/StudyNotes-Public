@@ -50,13 +50,15 @@
                 BoneWeight weight = _BoneWeightsBuffer[vertexID];
                 float4 worldPoses = 0;
                 float sum = 0;
+                // 得到顶点经过mesh权重后的世界坐标
                 for (uint i = 0; i < 4; ++i)
                 {
                     sum += weight.weights[i];
                     worldPoses += weight.weights[i] * mul(_BonePositionBuffer[weight.indices[i]], v.vertex);
                 }
+                // 得到顶点最终的世界坐标
                 worldPoses /= sum;
-                
+                // 得到顶点的屏幕坐标
                 o.vertex = mul(UNITY_MATRIX_VP, worldPoses);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
