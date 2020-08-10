@@ -882,7 +882,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 
   将运算结果从像素着色器移至顶点着色器我
 
-#### 朗伯余弦定律
+#### LambertCosine定律
 
 - 光：光子的集合，在空间中按特定的方向传播
 

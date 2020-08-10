@@ -20,7 +20,7 @@ public unsafe class MeowSkinned : MonoBehaviour
     /// <summary>
     /// mesh->world
     /// </summary>
-    private Matrix4x4[] bonePositions;
+    private Matrix4x4[] meshToWorld;
     /// <summary>
     /// 每个顶点的骨骼权重信息
     /// </summary>
@@ -53,7 +53,7 @@ public unsafe class MeowSkinned : MonoBehaviour
         mesh = meshRenderer.sharedMesh;
         bindPoses = mesh.bindposes;
         boneWeights = mesh.boneWeights;
-
+        
         bones = new Transform[meshRenderer.bones.Length];
         for (uint i = 0; i < bones.Length; ++i)
         {
@@ -69,7 +69,7 @@ public unsafe class MeowSkinned : MonoBehaviour
  
         boneWeightBuffer.SetData(boneWeights);
 
-        bonePositions = new Matrix4x4[bones.Length];
+        meshToWorld = new Matrix4x4[bones.Length];
         filter = gameObject.AddComponent<MeshFilter>();
         filter.sharedMesh = mesh;
         targetRenderer = gameObject.AddComponent<MeshRenderer>();
@@ -79,12 +79,12 @@ public unsafe class MeowSkinned : MonoBehaviour
 
     private void Update()
     {
-        for (int i = 0; i < bonePositions.Length; ++i)
+        for (int i = 0; i < meshToWorld.Length; ++i)
         {
             // mesh坐标系转世界坐标系
-            bonePositions[i] = bones[i].localToWorldMatrix/* 骨骼坐标系转世界坐标系 */ * bindPoses[i]/* mesh坐标系转骨骼坐标系 */;
+            meshToWorld[i] = bones[i].localToWorldMatrix/* 骨骼坐标系转世界坐标系 */ * bindPoses[i]/* mesh坐标系转骨骼坐标系 */;
         }
-        bonePositionBuffer.SetData(bonePositions);
+        bonePositionBuffer.SetData(meshToWorld);
         // 向GPU传值
         rendererBlock.Clear();
         rendererBlock.SetBuffer("_BoneWeightsBuffer", boneWeightBuffer);
