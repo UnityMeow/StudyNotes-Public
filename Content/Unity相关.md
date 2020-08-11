@@ -1,5 +1,13 @@
 # Unity Learn
 
+## AnimationClip
+
+![image-20200811173314413](Assets/Unity相关/image-20200811173314413.png)
+
+AnimationClip.frameRate
+
+AnimationClip.SampleAnimation
+
 ## Editor相关
 
 ```c#
