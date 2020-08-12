@@ -8,6 +8,14 @@ AnimationClip.frameRate
 
 AnimationClip.SampleAnimation
 
+### 获取Animator下所有的AnimationClip
+
+```c#
+AnimationClip[] clip = transform.GetComponent<Animator>().runtimeAnimatorController.animationClips;
+Debug.Log(clip.Length);
+Debug.Log(clip[0].name);
+```
+
 ## Editor相关
 
 ```c#
