@@ -1,5 +1,20 @@
 # Unity Learn
 
+## RuntimeInitializeOnLoadMethod
+
+ 初始化回调方法 
+
+没有场景 没有 游戏对象 的初始化 启动脚本
+
+```c#
+	[RuntimeInitializeOnLoadMethod]
+    static void GameStart()
+    {
+        GameObject go = Resources.Load<GameObject>("");
+        GameObject.Instantiate(go);
+    }
+```
+
 ## AnimationClip
 
 ![image-20200811173314413](Assets/Unity相关/image-20200811173314413.png)
