@@ -31,6 +31,16 @@ Debug.Log(clip.Length);
 Debug.Log(clip[0].name);
 ```
 
+## 性能优化相关
+
+[Profiler中WaitForTargetFPS详解](https://blog.csdn.net/suifcd/article/details/50942686)
+
+[Unity性能优化总结](https://www.jianshu.com/p/d6da201810a7)
+
+[Unity Profiler 性能分析](https://www.cnblogs.com/zhaoqingqing/p/5059479.html)
+
+[GPU分析工具RenderDoc使用](https://zhuanlan.zhihu.com/p/80704313)
+
 ## Editor相关
 
 ```c#
