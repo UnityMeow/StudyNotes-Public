@@ -52,3 +52,7 @@ Content/UnityProject/MeowComputeShader/Assembly-CSharp.csproj
 Content/UnityProject/MeowComputeShader/MeowComputeShader.sln
 Content/UnityProject/MeowComputeShader/.vs/MeowComputeShader/v16/.suo
 Content/UnityProject/MeowComputeShader/obj/
+Content/UnityProject/MeowAnimation/Library/
+Content/UnityProject/MeowAnimation/Temp/
+Content/UnityProject/MeowAnimation/.vs/
+Content/UnityProject/MeowAnimation/obj/

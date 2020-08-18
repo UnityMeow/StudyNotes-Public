@@ -9,8 +9,17 @@
     在cs中不是去处理mesh数据的，需要精确地声明出cs到底是在读和写什么数据。
     这个声明最前面的RW指出，cs将会读也会写这个变量。
 */
-RWTexture2D<float4> Result;
 
+struct CustomStruct
+{
+    float4 a;
+    float2 b;
+};
+
+RWTexture2D<float4> Result;
+// RW readWrite 可读可写
+// 不加RW 只可读
+RWStructuredBuffer<CustomStruct> _TestStruct;
 /* 
     这一行指明了cs生成的线程组的维度尺寸。
     GPU通过创建同时运行的线程来利用GPU的大量并行处理能力。
@@ -20,8 +29,13 @@ RWTexture2D<float4> Result;
     通常来说，将gpu看作是一组流处理去，每一个的性能都是同时处理x个线程。
     每一个处理器每次运行一个线程组，所以理想情况下你希望你的线程组包含x个线程（也就是最大性能数量）。
 */
-[numthreads(8, 8, 1)] 
-void CSMain(uint3 id : SV_DispatchThreadID)
+[numthreads(64, 1, 1)] 
+void CSMain(uint id : SV_DispatchThreadID)
 {
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
+    // 改变传入数据
+    CustomStruct cache = _TestStruct[id];
+    cache.a += 5;
+    cache.b += 3;
+    _TestStruct[id] = cache;
+   // Result[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
 }

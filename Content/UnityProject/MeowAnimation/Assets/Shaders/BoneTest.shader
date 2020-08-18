@@ -44,10 +44,11 @@
 
             StructuredBuffer<BoneWeight> _BoneWeightsBuffer;
             StructuredBuffer<float4x4> _BonePositionBuffer;
+            StructuredBuffer<float3> _VertexBuffer;
             v2f vert (appdata v, uint vertexID : SV_VERTEXID)
             {
                 v2f o;
-                BoneWeight weight = _BoneWeightsBuffer[vertexID];
+              /*  BoneWeight weight = _BoneWeightsBuffer[vertexID];
                 float4 worldPoses = 0;
                 float sum = 0;
                 // 得到顶点经过mesh权重后的世界坐标
@@ -57,9 +58,10 @@
                     worldPoses += weight.weights[i] * mul(_BonePositionBuffer[weight.indices[i]], v.vertex);
                 }
                 // 得到顶点最终的世界坐标
-                worldPoses /= sum;
+                worldPoses /= sum;*/
+
                 // 得到顶点的屏幕坐标
-                o.vertex = mul(UNITY_MATRIX_VP, worldPoses);
+                o.vertex = mul(UNITY_MATRIX_VP, float4(_VertexBuffer[vertexID], 1));
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;

@@ -1,0 +1,33 @@
+﻿#pragma kernel CSMain
+
+struct BoneWeight
+{
+    float4 weights;
+    int4 indices;
+};
+
+StructuredBuffer<BoneWeight> _BoneWeightsBuffer;
+StructuredBuffer<float4x4> _BonePositionBuffer;
+StructuredBuffer<float3> _VertexReadBuffer;
+RWStructuredBuffer<float3> _VertexBuffer;
+uint _Count;
+
+[numthreads(64, 1, 1)]
+void CSMain(uint id : SV_DispatchThreadID)
+{
+    if (id >= _Count)
+        return;
+    BoneWeight weight = _BoneWeightsBuffer[id];
+    float4 worldPoses = 0;
+    float sum = 0;
+    // 得到顶点经过mesh权重后的世界坐标
+    for (uint i = 0; i < 4; ++i)
+    {
+        sum += weight.weights[i];
+        worldPoses += weight.weights[i] * mul(_BonePositionBuffer[weight.indices[i]], float4(_VertexReadBuffer[id], 1));
+    }
+    // 得到顶点最终的世界坐标
+    worldPoses /= sum;
+    _VertexBuffer[id] = worldPoses;
+
+}

@@ -39,6 +39,8 @@ public unsafe class MeowSkinned : MonoBehaviour
     //传入Shader的Buffer
     private ComputeBuffer bonePositionBuffer;
     private ComputeBuffer boneWeightBuffer;
+    private ComputeBuffer vertexBuffer;
+    private ComputeBuffer vertexReadBuffer;
 
     /// <summary>
     /// 最终要画上去的meshRenderer
@@ -46,8 +48,11 @@ public unsafe class MeowSkinned : MonoBehaviour
     private MeshRenderer targetRenderer;
     private MeshFilter filter;
 
+    private ComputeShader compute;
+
     private void Awake()
     {
+        compute = Resources.Load<ComputeShader>("CShader");
         meshRenderer = GetComponent<SkinnedMeshRenderer>();
         rendererBlock = new MaterialPropertyBlock();
         mesh = meshRenderer.sharedMesh;
@@ -66,7 +71,12 @@ public unsafe class MeowSkinned : MonoBehaviour
         boneWeightBuffer = new ComputeBuffer(
             boneWeights.Length,
             sizeof(BoneWeight));
- 
+        Vector3[] vertices = mesh.vertices;
+        vertexBuffer = new ComputeBuffer(
+            vertices.Length, sizeof(Vector3));
+        vertexReadBuffer = new ComputeBuffer(
+             vertices.Length, sizeof(Vector3));
+        vertexReadBuffer.SetData(vertices);
         boneWeightBuffer.SetData(boneWeights);
 
         meshToWorld = new Matrix4x4[bones.Length];
@@ -87,9 +97,21 @@ public unsafe class MeowSkinned : MonoBehaviour
         bonePositionBuffer.SetData(meshToWorld);
         // 向GPU传值
         rendererBlock.Clear();
+
+        //shader->BindRootSignature
+        compute.SetBuffer(0, "_BoneWeightsBuffer", boneWeightBuffer);
+        compute.SetBuffer(0, "_BonePositionBuffer", bonePositionBuffer);
+        compute.SetBuffer(0, "_VertexBuffer", vertexBuffer);
+        compute.SetBuffer(0, "_VertexReadBuffer", vertexReadBuffer);
+        int threadCount = boneWeightBuffer.count;
+        compute.SetInt("_Count", threadCount);
+        compute.Dispatch(0, (threadCount + 63) / 64, 1, 1);
+
         rendererBlock.SetBuffer("_BoneWeightsBuffer", boneWeightBuffer);
         rendererBlock.SetBuffer("_BonePositionBuffer", bonePositionBuffer);
+        rendererBlock.SetBuffer("_VertexBuffer", vertexBuffer);
         targetRenderer.SetPropertyBlock(rendererBlock);
+ 
     }
 
     private void OnDestroy()
