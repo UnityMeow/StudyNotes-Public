@@ -507,6 +507,19 @@ void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint
 - 如果引用的头文件的cpp不在项目文件夹里，要导进来， 否则会无法解析
 
   `#include "../../Common/d3dUtil.h"`
+  
+- 数据类型传递 尽可能的传递引用类型 不要传递值类型
+
+  ```c++
+  ArrayList<Math::Matrix4> const& AnimationClip::GetAllBonePos() const
+  {
+  	return allBonePos;
+  }
+  ```
+
+- 取智能指针地址
+
+  `vertexBufferResult.get()`
 
 ## VS扩展
 

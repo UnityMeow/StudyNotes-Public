@@ -14,7 +14,7 @@
 
   光栅化Shader所需文件：`XXX.hlsl`    `XXX.prop`
 
-  ComputeShader所需文件：`XXX.compute.prop`
+  ComputeShader所需文件：`XXX.compute`  `xxx.prop`
 
 - 在`Shaders\ShaderCompile.md`文件中将创建的Shader相对路径填入，供Shader命令行编译使用
 
@@ -338,7 +338,7 @@
 
 BarrierBuffer 设置资源当前数据的读写状态，用来确保多线程数据读写的线程安全，类似于多线程中的`std::atomic`
 
-dx12之所以比dx11性能高，是因为增加了BarrierBuffer，这样就可以使用多线程进行资源绑定，如果没有BarrierBuffer，使用多线程就会出现数据紊乱的情况
+dx12之所以比dx11性能高，是因为增加了BarrierBuffer，这样就可以收集GPU任务之间的同步操作，减少不必要的串行同步，提高并行渲染的性能。
 
 ### 添加纹理贴图
 
@@ -407,7 +407,7 @@ dx12之所以比dx11性能高，是因为增加了BarrierBuffer，这样就可�
 
     `GBufferGlobal::_MeowTex = ShaderID::PropertyToID("_MeowTex");`
 
-  - 将贴图数据传入GPU
+  - 将贴图资源的地址（描述符）传入GPU
 
     ```c++
     meowShader->SetResource(
@@ -508,3 +508,112 @@ cbufferData[1] = float4(0, 1, 0, 1);
 GBufferGlobal::testStructBuffer->CopyDatas(0, 2, cbufferData);
 ```
 
+## ComputeShader
+
+### 用法
+
+- 初始化
+
+  ```c++
+  const ComputeShader* froxelShader;
+  froxelShader = ShaderCompiler::GetComputeShader("Froxel");
+  ```
+
+- 获得全局描述符堆
+
+  ```c++
+  DescriptorHeap const* heap = Graphics::GetGlobalDescHeap();
+  ```
+
+- 设置根签名
+
+  ```c++
+  froxelShader->BindRootSignature(commandList, heap);
+  ```
+
+- 资源绑定到Shader
+
+  ```c++
+  froxelShader->SetResource(commandList, FroxelParams, &camData->cbuffer, res->GetFrameIndex());
+  froxelShader->SetResource(commandList, LightCullCBuffer_ID, &lightData->lightCBuffer, res->GetFrameIndex());
+  auto constBufferID = res->cameraCBs[cam->GetInstanceID()];
+  froxelShader->SetResource(commandList, ShaderID::GetPerCameraBufferID(), constBufferID.buffer, constBufferID.element);
+  froxelShader->SetResource(commandList, _GreyTex, heap, 0);
+  froxelShader->SetResource(commandList, _GreyCubemap, heap, 0);
+  ```
+
+- 设置发送数组数据长度
+
+  ```c++
+  // 先合并
+  barrier->ExecuteCommand(commandList);
+  froxelShader->Dispatch(commandList, 2, dispatchCount.x, dispatchCount.y, dispatchCount.z);
+  ```
+
+- 避免数据紊乱设置BarrierBuffer
+
+  ```c++
+  // 塞入队列
+  barrier->UAVBarrier(camData->lastVolume->GetResource());
+  ```
+
+
+
+## 关于CPU到GPU数据传递
+
+- **FrameResource**
+
+  ```c++
+  FrameResource* resource;
+  
+  SkinnedPerFrameData* frameData = (SkinnedPerFrameData*)resource->GetResource(
+  			selfPtr,
+  			[&]()->SkinnedPerFrameData*
+  			{
+  				return new SkinnedPerFrameData(device, bonePosArray.size());
+  			});
+  
+  ```
+
+- **UploadBuffer**
+
+  ```c++
+  class SkinnedPerFrameData : public IPipelineResource
+  {
+  public:
+  	UploadBuffer bonePositionBuffer;
+  	SkinnedPerFrameData(ID3D12Device* device, uint boneCount) 
+  		:
+  		bonePositionBuffer(device, boneCount, false, sizeof(float4x4))
+  	{
+  
+  	}
+  };
+  ```
+
+- **SetData**
+
+  相当于
+
+  `ComputeBuffer bonePositionBuffer;` 
+
+  `bonePositionBuffer.SetData(meshToWorld);`
+
+  ```c++
+  void* gpuPtr = frameData->bonePositionBuffer.GetMappedDataPtr(0);
+  memcpy(gpuPtr, bonePosArray.data(), sizeof(float4x4) * bonePosArray.size());
+  ```
+
+- SetResource
+
+  ```c++
+  skinnedShader->SetResource<UploadBuffer>(commandList, SkinnedMeshGlobal::_BonePositionBuffer, &frameData->bonePositionBuffer, 0);
+  ```
+
+- Dispatch
+
+## 资源管理
+
+### 用法
+
+- 
