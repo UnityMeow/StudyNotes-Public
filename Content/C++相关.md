@@ -520,6 +520,8 @@ void StringUtil::SubString(const vengine::string& str, uint64_t startIndex, uint
 - 取智能指针地址
 
   `vertexBufferResult.get()`
+  
+- 全局变量千万不要定义到.h中！
 
 ## VS扩展
 

@@ -561,6 +561,8 @@ GBufferGlobal::testStructBuffer->CopyDatas(0, 2, cbufferData);
 
 ## 关于CPU到GPU数据传递
 
+### ComputeBuffer数据传递
+
 - **FrameResource**
 
   ```c++
@@ -612,8 +614,44 @@ GBufferGlobal::testStructBuffer->CopyDatas(0, 2, cbufferData);
 
 - Dispatch
 
-## 资源管理
+### ConstantBuffer(cbuffer)数据传递
 
-### 用法
+- 定义相应的结构体数据
 
-- 
+  ```c++
+  struct SkinComputeParam
+  {
+  	uint _Count;
+  	float _XXXXX;
+  };
+  SkinnedMeshGlobal::SkinComputeParam param;
+  param._Count = 123;
+  param._XXXXX =1.23f;
+  ```
+
+- 定义一个CBufferPool（类似对象池）
+
+  ```c++
+  CBufferPool* paramPool;
+  ```
+
+- 通过CBufferPool生成CBufferElement，同时在析构时销毁
+
+  ![image-20200821144709942](Assets/Virtual Engine从入门到放弃/image-20200821144709942.png)
+
+- 数据拷贝 SetData
+
+  ```c++
+  void* cbuffGpuPtr = frameData->cbufferEle.buffer->GetMappedDataPtr(frameData->cbufferEle.element);
+  memcpy(cbuffGpuPtr, &param, sizeof(param));
+  ```
+
+- 通过地址设置到GPU
+
+  ```c++
+  skinnedShader->SetBufferByAddress(
+  	commandList, 
+  	ShaderID::GetParams(), 
+  	frameData->cbufferEle.buffer->GetAddress(frameData->cbufferEle.element));
+  ```
+

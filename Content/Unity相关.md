@@ -190,6 +190,8 @@ public class People : MonoBehaviour {
 
 [Customize the Unity Editor with UIElements!](https://www.youtube.com/watch?v=CZ39btQ0XlE)
 
+https://www.jianshu.com/p/97520d98a1f2
+
 ## 资源相关
 
 [资源机制](https://www.jianshu.com/p/ca5cb9d910c0)
