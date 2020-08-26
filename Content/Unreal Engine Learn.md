@@ -1,5 +1,9 @@
 ## Unreal Engine Learn
 
+[为Unity开发者准备的Unreal教程](https://docs.unrealengine.com/zh-CN/GettingStarted/FromUnity/index.html)
+
+[为Unreal开发者准备的Unity教程](https://learn.unity.com/tutorial/transitioning-from-unreal-to-unity?language=en#5d518e11edbc2a002007f178)
+
 - **项目构建问题**
 
   UE4.25版本 需要VS2017 15.9版本才可以对C++项目进行构建，否则项目会构建失败
@@ -490,4 +494,69 @@ UE提供多种字符类型进行数据处理，不同情况选择相应的类型
 - FName	资源命名字符串 通过一个轻型系统使用字符串，在该系统中，特定字符串即使会被重复使用，在数据表中也只存储一次，FName不区分大小写，它们是不可变的，无法被操作。FName的存储系统和静态特性决定了通过键进行查找访问的速度较快。FName子系统的另外一个功能是用散列表为FName转换提供快速字符串
 - FText	UI相关使用的字符串，用户的显示文本都需要FText进行处理，支持格式化文本，不提供修改函数，无法进行内容修改
 - FString	可以被操作的字符串，开销大于其他字符串类型
+
+#### Level相关
+
+- Unreal的Level与Unity的Scene略微有所不同，Level更抽象一点
+
+- World里面会包含一堆Level，Level里面包含一堆Actor，但所有的Actor都在World里面，Level更类似是一层抽象的概念，记录哪些Actor属于这个Level
+
+- 获取当前Level内的所有Actor的API
+
+  ```C++
+  // For every actor in this level...
+  for (TActorIterator<AActor> actor(GWorld); actor; ++actor)
+  {
+      auto actorName = actor->GetName();
+      UE_LOG(LogTemp, Display,TEXT("%s"),*actorName);
+  }
+  ```
+
+#### Component相关
+
+- 凡是3D游戏引擎必然要抽象模拟一个3D游戏世界，而为了展示这个世界则需要一个个可以变换可以互相嵌套的游戏对象，而其他的物理模拟，游戏逻辑最终目的也都是为了操作这些游戏对象，Unity中采用了GameObject做为游戏对象，Component作为游戏对象的组件，Unreal中采用Actor，作为游戏对象，以及Component作为游戏对象组件。
+
+- Unreal中的Actor与Unity的GameObject是不同的，Untiy中的每一个GameObject都会绑定Transform组件，Unreal的Actor可以绑定，也可以不绑定，如果一个对象需要在3D世界中表示，那么它必然要携带一个Transform来表示其位置，但在Unreal看来，Actor并不只是3D中的“ 表示 ”，一些不在世界里展示的“ 不可见对象 ”也可以是Actor，Actor的概念在UE里其实不是某种具象化的3D世界里的对象，而是世界里的种种元素，小到一个个地上的石头，大到整个世界的运行规则，都可以看作是一个Actor
+
+![img](Assets/Unreal Engine Learn/v2-91234c7d5bc32dd04c7221ac9dcc56d0_720w.jpg)
+
+正常来说Unity一个GameObject对应一个Transform，MeshFiter等，不可以加多个。但Unreal可以，Unreal将Component分为了两大类：SceneComponent、ActorComponent
+
+- SceneComponent
+
+  每个Actor有且只有一个RootComponent（SceneComponent），RootComponent可以嵌套多个SceneComponent，每个SceneComponent都可以加Transform、StaticMesh等组件
+
+- ActorComponent
+
+  不可以互相嵌套，并且没有Transform、StaticMesh等组件，一般是用做一些逻辑功能性组件
+
+#### 编辑器拓展学习
+
+[别人的编辑器扩展踩坑血泪史](https://segmentfault.com/a/1190000018367388)
+
+- CPP写BlueprintFunctionLibrary
+
+  1. 新建c++类
+
+     <img src="Assets/Unreal Engine Learn/image-20200824163343316.png" alt="image-20200824163343316" style="zoom:50%;" />
+
+  2. 创建BlueprintFunctionLibrary类
+
+     <img src="Assets/Unreal Engine Learn/image-20200824165333125.png" alt="image-20200824165333125" style="zoom:50%;" />
+
+  3. 设置类的相关参数
+
+     <img src="Assets/Unreal Engine Learn/image-20200824163645955.png" alt="image-20200824163645955" style="zoom:67%;" />
+
+  4. 
+
+- CPP编译了没有效果就找到Modules点Reload或者Recompile
+
+  ![image-20200824163000475](Assets/Unreal Engine Learn/image-20200824163000475.png)
+
+#### 遇事不决点这里
+
+- 重新生成vs项目文件后，再启动项目工程
+
+![image-20200824153607307](Assets/Unreal Engine Learn/image-20200824153607307.png)
 
