@@ -530,6 +530,8 @@ UE提供多种字符类型进行数据处理，不同情况选择相应的类型
 
   不可以互相嵌套，并且没有Transform、StaticMesh等组件，一般是用做一些逻辑功能性组件
 
+由于一个Actor有多个SceneComponent，所以一个Actor将会有多个Transform，由于Actor有多个Transform，所以Actor的父子关系是由Component来确定的，通过Child:AttachToActor或Child:AttachToComponent来创建父子连接
+
 #### 编辑器拓展学习
 
 [别人的编辑器扩展踩坑血泪史](https://segmentfault.com/a/1190000018367388)
@@ -548,8 +550,6 @@ UE提供多种字符类型进行数据处理，不同情况选择相应的类型
 
      <img src="Assets/Unreal Engine Learn/image-20200824163645955.png" alt="image-20200824163645955" style="zoom:67%;" />
 
-  4. 
-
 - CPP编译了没有效果就找到Modules点Reload或者Recompile
 
   ![image-20200824163000475](Assets/Unreal Engine Learn/image-20200824163000475.png)
@@ -560,3 +560,4 @@ UE提供多种字符类型进行数据处理，不同情况选择相应的类型
 
 ![image-20200824153607307](Assets/Unreal Engine Learn/image-20200824153607307.png)
 
+​      
