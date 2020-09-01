@@ -532,6 +532,29 @@ UE提供多种字符类型进行数据处理，不同情况选择相应的类型
 
 由于一个Actor有多个SceneComponent，所以一个Actor将会有多个Transform，由于Actor有多个Transform，所以Actor的父子关系是由Component来确定的，通过Child:AttachToActor或Child:AttachToComponent来创建父子连接
 
+#### 蓝图
+
+- 使CPP方法能在蓝图上调用要把方法写为public static的 零外在方法上面要加`UFUNCTION(BlueprintCallable)`
+- 使变量能在蓝图上读写要在变量上面加`UPROPERTY(BlueprintReadWrite)`
+
+#### EditorSubsystem
+
+- 相当于一个单例类，可以用来搞数据什么的，继承UEditorSubsystem类即可
+
+- 使用EditorSubsystem需要再Build.cs里加上EditorSubsystem模块的引用
+
+  ```c++
+  if (Target.bBuildEditor)
+  {
+  	PublicDependencyModuleNames.AddRange(new string[] { "EditorSubsystem" });
+  }
+  ```
+
+#### FString
+
+- FString本质其实是`TArray<TCHAR>`，通过GetData就可以拿到TCHAR*，而TCHAR就是wchar_t
+- TEXT("XXX")就是一个宏，把L"XXX"给包了一下，本质没有区别，直接FString s = L"XXX"; 是一样的
+
 #### 编辑器拓展学习
 
 [别人的编辑器扩展踩坑血泪史](https://segmentfault.com/a/1190000018367388)

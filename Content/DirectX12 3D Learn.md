@@ -4,9 +4,11 @@
 
 [DirectX3D 12 编程指南](https://docs.microsoft.com/zh-cn/windows/win32/direct3d12/directx-12-programming-guide)
 
-[官网API文档](https://docs.microsoft.com/en-us/windows/win32/api/)
+[DirectX3D 12 API文档](https://docs.microsoft.com/en-us/windows/win32/api/_direct3d12/)
 
-[官方代码示例库](https://github.com/d3dcoder/d3d12book)
+[DirectX3D 12 代码示例库](https://github.com/d3dcoder/d3d12book)
+
+[DirectX3D 12 喵喵练习库](https://github.com/UnityMeow/StudyNotes-Public/tree/master/Content/DirectLearn)
 
 ## 数学知识
 
@@ -343,17 +345,11 @@ v1 × v2 = (v1.x, v1.y) * (-v1.y, v1.x) = 0     v1 ⊥ v2 ，v1 ⊥ -v2
 
 - 可以直接用封装好的库
 
-### 三角函数
-
 ##  Direct3D 基础
 
 ### Direct3D的初始化
 
 #### 预备知识
-
-- Direct3D 12 基本概念
-
-  底层图形应用程序编程接口，可在应用程序中对图形处理器进行控制和编程，借此以硬件加速的方式渲染虚拟的3D场景
 
 - 组件对象模型(COM)
 
